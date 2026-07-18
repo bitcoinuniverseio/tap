@@ -1,24 +1,35 @@
 # TAP Protocol documentation
 
-A standalone Bitcoin Universe documentation site for TAP Protocol.
+Bitcoin Universe documentation for TAP Protocol on Bitcoin.
 
-## Included
+## What this covers
 
-- `index.html`: visual protocol overview, lifecycle, payload examples, and safety guidance
-- `reference.html`: field reference and integration checklist
-- `llms.txt`: compact machine-readable protocol summary
+TAP begins with deploy, mint, and two-step transfer operations, then adds authorities, P2P, mass-send, and decentralized token functionality. Basic operations use JSON inscriptions with p set to tap.
+
+## State model
+
+The basic transfer mirrors Ordinal transferables: create a transfer inscription, then move it. Extended functions can add approval and authority state, so every participant needs the same parser and feature support.
+
+## Documentation site
+
+- Overview: [index.html](index.html)
+- Field reference: [reference.html](reference.html)
+- Build and verification playbook: [guide.html](guide.html)
+
+## Core rules
+
+- Basic operation values are token-deploy, token-mint, and token-transfer.
+- Tickers can use one to 32 visual Unicode symbols under TAP rules.
+- Existing tickers cannot be deployed again.
+- A basic transfer completes only after its transferable is sent.
+- Sending a transferable to yourself cancels it.
+- Authority and DMT workflows have their own approval and validation rules.
+
+## Source material
+
+- [TAP documentation](https://docs.tap-protocol.com/)
+- [TAP basic functions](https://docs.tap-protocol.com/functions/quickstart)
 
 ## Scope
 
-An Ordinals metaprotocol with BRC-20-compatible basic token functions and extended capabilities such as authorities, mass-send, and Digital Matter Theory.
-
-This repository is a navigational integration guide. The linked primary sources and their active reference implementations are authoritative.
-
-## Sources
-
-- [TAP developer docs](https://docs.tap-protocol.com/)
-- [TAP basic functions](https://docs.tap-protocol.com/functions/quickstart)
-
-## Local preview
-
-Open `index.html` in a browser, or serve this directory with any static file server. GitHub Pages can publish directly from the repository root.
+TAP extensions are protocol features, not cosmetic aliases. Gate them behind explicit parser and wallet compatibility checks.
