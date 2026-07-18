@@ -1,0 +1,39 @@
+# TAP Protocol | Bitcoin Universe Protocol Reference
+
+> Human docs: index.html
+> Field reference: reference.html
+> Network: Bitcoin
+> Classification: Extendible OrdFi on Bitcoin
+
+## Summary
+
+An Ordinals metaprotocol with BRC-20-compatible basic token functions and extended capabilities such as authorities, mass-send, and Digital Matter Theory.
+
+## State model
+
+JSON text inscriptions interpreted by TAP readers, plus opt-in extended functions that can be approved by sending an inscription to yourself.
+
+## Lifecycle
+
+1. Token deploy
+2. Mint inscription
+3. Transferable
+4. TAP extension
+
+## Operations
+
+- Token deploy: Defines a token with maximum supply and mint limit.
+- Token mint: Credits a valid mint amount to the inscription owner.
+- Token transfer: Creates a transferable that settles when the Ordinal is sent.
+- Extended function: Adds opt-in capabilities such as authorities, mass send, and P2P flows.
+
+## Safety
+
+1. Basic TAP token functions mirror BRC-20-style deploy, mint, and two-step transfer behavior, but ticker rules differ.
+2. Whitespace and Unicode can be valid tickers. Render and compare tickers carefully.
+3. Extended functions are tappable and version-sensitive. Follow the exact function documentation and approval process.
+
+## Sources
+
+- TAP developer docs: https://docs.tap-protocol.com/
+- TAP basic functions: https://docs.tap-protocol.com/functions/quickstart
