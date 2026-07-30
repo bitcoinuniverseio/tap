@@ -1,51 +1,32 @@
 # TAP Protocol
 
-> A programmable Ordinals token protocol with basic and extended operations.
+> TAP begins with deploy, mint, and transfer, then opens into authorities, peer-to-peer experiences, mass sends, and decentralized token mechanics.
 
-## Chain and carrier
+## Public experience
 
-- Chain: Bitcoin
-- Carrier: Ordinal JSON inscription
+- Home: https://bitcoinuniverse.github.io/tap/
+- Discover: https://bitcoinuniverse.github.io/tap/reference.html
+- Get started: https://bitcoinuniverse.github.io/tap/guide.html
+- Bitcoin Universe: https://inscribe.bitcoinuniverse.io/
 
-## Overview
+## The experience
 
-TAP begins with deploy, mint, and two-step transfer operations, then adds authorities, P2P, mass-send, and decentralized token functionality. Basic operations use JSON inscriptions with p set to tap.
+- Launch: Create a token identity and define its supply and mint personality.
+- Collect: Mint under the token’s terms and hold it in a compatible wallet.
+- Connect: Transfer, coordinate, and explore richer TAP-enabled experiences.
 
-## State model
+## In plain language
 
-The basic transfer mirrors Ordinal transferables: create a transfer inscription, then move it. Extended functions can add approval and authority state, so every participant needs the same parser and feature support.
+- Basic actions: Deploy, mint, and transfer form the familiar TAP foundation.
+- Transferables: A transfer becomes an inscription that is sent to its destination.
+- Expressive tickers: TAP supports a broad visual character space for identities.
+- Extensions: Compatible experiences can add authorities, P2P, DMT, and more.
 
-## Lifecycle
+## User safety
 
-1. Deploy a ticker and its max supply.
-2. Mint under its configured limit.
-3. Create a transferable and send the inscription to settle a basic transfer.
-4. Opt into extension flows only with compatible wallets and indexers.
+TAP transfers and extensions depend on compatible wallet and service support. Protect transferable inscriptions from accidental spending and verify the exact action, destination, and fees before signing.
 
-## Rules
+## Community resources
 
-- Basic operation values are token-deploy, token-mint, and token-transfer.
-- Tickers can use one to 32 visual Unicode symbols under TAP rules.
-- Existing tickers cannot be deployed again.
-- A basic transfer completes only after its transferable is sent.
-- Sending a transferable to yourself cancels it.
-- Authority and DMT workflows have their own approval and validation rules.
-
-## Field reference
-
-- p (string, required: yes): Literal tap.
-- op (string, required: yes): Basic token operation or a supported extension operation.
-- tick (Unicode string, required: yes): One through 32 visual symbols, subject to TAP ticker rules.
-- max (integer string, required: deploy): Maximum supply.
-- lim (integer string, required: deploy): Per-mint limit.
-- amt (integer string, required: mint / transfer): Positive operation amount.
-- authority data (extension-specific, required: extension): Required for authority, privilege, P2P, or DMT flows.
-
-## Primary sources
-
-- TAP documentation: https://docs.tap-protocol.com/
-- TAP basic functions: https://docs.tap-protocol.com/functions/quickstart
-
-## Operational caution
-
-TAP extensions are protocol features, not cosmetic aliases. Gate them behind explicit parser and wallet compatibility checks.
+- Explore TAP: https://docs.tap-protocol.com/
+- See TAP’s core experiences: https://docs.tap-protocol.com/functions/quickstart

@@ -1,35 +1,32 @@
-# TAP Protocol documentation
+# TAP Protocol
 
-Bitcoin Universe documentation for TAP Protocol on Bitcoin.
+## Make tokens move with imagination.
 
-## What this covers
+TAP begins with deploy, mint, and transfer, then opens into authorities, peer-to-peer experiences, mass sends, and decentralized token mechanics.
 
-TAP begins with deploy, mint, and two-step transfer operations, then adds authorities, P2P, mass-send, and decentralized token functionality. Basic operations use JSON inscriptions with p set to tap.
+TAP Protocol is part of the growing Bitcoin Universe—an onchain landscape for creators, collectors, and communities who want their digital stories to last.
 
-## State model
+## Step inside
 
-The basic transfer mirrors Ordinal transferables: create a transfer inscription, then move it. Extended functions can add approval and authority state, so every participant needs the same parser and feature support.
+- [Experience the story](https://bitcoinuniverse.github.io/tap/)
+- [Discover how it works](https://bitcoinuniverse.github.io/tap/reference.html)
+- [Start your journey](https://bitcoinuniverse.github.io/tap/guide.html)
+- [Open Bitcoin Universe](https://inscribe.bitcoinuniverse.io/)
 
-## Documentation site
+## What makes it special
 
-- Overview: [index.html](index.html)
-- Field reference: [reference.html](reference.html)
-- Build and verification playbook: [guide.html](guide.html)
+- **Launch:** Create a token identity and define its supply and mint personality.
+- **Collect:** Mint under the token’s terms and hold it in a compatible wallet.
+- **Connect:** Transfer, coordinate, and explore richer TAP-enabled experiences.
 
-## Core rules
+## A clear onchain promise
 
-- Basic operation values are token-deploy, token-mint, and token-transfer.
-- Tickers can use one to 32 visual Unicode symbols under TAP rules.
-- Existing tickers cannot be deployed again.
-- A basic transfer completes only after its transferable is sent.
-- Sending a transferable to yourself cancels it.
-- Authority and DMT workflows have their own approval and validation rules.
+TAP uses Ordinal inscriptions to create transferable token actions. Its broader feature set lets compatible experiences add richer coordination around those assets.
 
-## Source material
+## Stay in control
 
-- [TAP documentation](https://docs.tap-protocol.com/)
-- [TAP basic functions](https://docs.tap-protocol.com/functions/quickstart)
+TAP transfers and extensions depend on compatible wallet and service support. Protect transferable inscriptions from accidental spending and verify the exact action, destination, and fees before signing.
 
-## Scope
+---
 
-TAP extensions are protocol features, not cosmetic aliases. Gate them behind explicit parser and wallet compatibility checks.
+Presented by [Bitcoin Universe](https://github.com/bitcoinuniverse).
