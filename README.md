@@ -4,7 +4,7 @@
 
 TAP begins with deploy, mint, and transfer, then opens into authorities, peer-to-peer experiences, mass sends, and decentralized token mechanics.
 
-TAP Protocol is part of the growing Bitcoin Universe—an onchain landscape for creators, collectors, and communities who want their digital stories to last.
+TAP Protocol is part of the growing Bitcoin Universe, an onchain landscape for creators, collectors, and communities who want their digital stories to last.
 
 ## Step inside
 
