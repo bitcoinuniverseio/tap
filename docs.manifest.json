@@ -4,7 +4,7 @@
   "name": "TAP Protocol",
   "classification": "protocol",
   "repository": "bitcoinuniverseio/tap",
-  "documentationUrl": "https://docs.bitcoinuniverse.io/protocols/tap",
+  "documentationUrl": "https://docs.bitcoinuniverse.io/protocols/tap/",
   "docsRoot": ".",
   "sourceRef": "main",
   "lifecycle": "experimental",
