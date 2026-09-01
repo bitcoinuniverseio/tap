@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="TAP: inscribed tokens with delegated authority, on Bitcoin mainnet">
+  <rect width="1200" height="630" fill="#0b0e26"/>
+  <rect x="0" y="0" width="1200" height="6" fill="#ffcb5c"/>
+
+  <g transform="translate(88 96)">
+    <path d="M56 0 108 30v60L56 120 4 90V30Z" fill="#1a2150" stroke="#9db3ff" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M29 60 48 79 84 37" fill="none" stroke="#ffcb5c" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <text x="88" y="292" fill="#a9b0d6" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="26" letter-spacing="5">BITCOIN MAINNET . ORDINAL INSCRIPTIONS</text>
+  <text x="88" y="368" fill="#e9ebf9" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="72" font-weight="700">TAP</text>
+  <text x="88" y="440" fill="#e9ebf9" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="42" font-weight="600">Inscribed tokens that can</text>
+  <text x="88" y="490" fill="#ffcb5c" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="42" font-weight="600">delegate authority</text>
+
+  <rect x="88" y="528" width="360" height="4" fill="#2b3260"/>
+  <text x="88" y="576" fill="#a9b0d6" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="24">Specification, guide, reference, test vectors, validator</text>
+
+  <g opacity="0.5">
+    <rect x="760" y="180" width="330" height="86" rx="12" fill="#1a2150" stroke="#4a58a8" stroke-width="3"/>
+    <text x="786" y="216" fill="#c3c9ea" font-family="Consolas, monospace" font-size="22">token-transfer</text>
+    <text x="786" y="246" fill="#a9b0d6" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="18">ordinary operation</text>
+
+    <rect x="760" y="296" width="330" height="86" rx="12" fill="#2c2310" stroke="#8a6a1e" stroke-width="3"/>
+    <text x="786" y="332" fill="#ffcb5c" font-family="Consolas, monospace" font-size="22">token-send</text>
+    <text x="786" y="362" fill="#ffcb5c" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="18">authority required</text>
+
+    <rect x="760" y="412" width="330" height="86" rx="12" fill="#2c2310" stroke="#8a6a1e" stroke-width="3"/>
+    <text x="786" y="448" fill="#ffcb5c" font-family="Consolas, monospace" font-size="22">prv</text>
+    <text x="786" y="478" fill="#ffcb5c" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="18">binds the authority</text>
+  </g>
+</svg>

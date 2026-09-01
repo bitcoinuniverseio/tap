@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TAP test vectors: accepted and rejected payloads with reasons</title>
+<meta name="description" content="Worked TAP test vectors for Bitcoin mainnet, accepted and rejected, each with the exact rule that decides it. Taken from the test suite of Bitcoin Universe's TAP indexer.">
+<link rel="canonical" href="https://bitcoinuniverseio.github.io/tap/vectors.html">
+<meta name="theme-color" content="#0b0e26" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f5fb" media="(prefers-color-scheme: light)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TAP test vectors: accepted and rejected payloads with reasons">
+<meta property="og:description" content="Accepted and rejected TAP payloads with the exact rule behind each outcome.">
+<meta property="og:url" content="https://bitcoinuniverseio.github.io/tap/vectors.html">
+<meta property="og:image" content="https://bitcoinuniverseio.github.io/tap/og.svg">
+<meta property="og:site_name" content="TAP protocol documentation">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="masthead">
+  <div class="shell masthead-in">
+    <a class="seal" href="index.html">
+      <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true" focusable="false">
+        <path d="M17 2.4 29.6 9.2v15.6L17 31.6 4.4 24.8V9.2Z" fill="var(--indigo-soft)" stroke="var(--indigo)" stroke-width="1.6" stroke-linejoin="round"/>
+        <path d="M10.8 17.4 15.2 22 23.2 12.6" fill="none" stroke="var(--gold-line)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>TAP<small>Protocol documentation</small></span>
+    </a>
+    <nav class="mainnav" aria-label="Documentation sections">
+      <ul>
+        <li><a href="index.html">Overview</a></li>
+        <li><a href="spec.html">Specification</a></li>
+        <li><a href="guide.html">Guide</a></li>
+        <li><a href="reference.html">Reference</a></li>
+        <li><a href="vectors.html" aria-current="page">Test vectors</a></li>
+        <li><a href="validator.html">Validator</a></li>
+        <li><a href="changelog.html">Changelog</a></li>
+      </ul>
+    </nav>
+    <div class="tools">
+      <form class="searchbox" role="search" hidden>
+        <label class="vh" for="site-search">Search this documentation</label>
+        <input id="site-search" type="search" placeholder="Search, or press /" autocomplete="off" data-base="" hidden>
+        <ul class="hitlist" id="site-search-results"></ul>
+      </form>
+      <button class="themebtn" id="theme-toggle" type="button" hidden aria-pressed="false">Dark</button>
+    </div>
+  </div>
+</header>
+
+<div class="shell frame">
+  <nav class="sidenav" aria-label="On this page">
+    <p>On this page</p>
+    <ul>
+      <li><a href="#how">How to read these</a></li>
+      <li><a href="#accepted">Accepted vectors</a></li>
+      <li><a href="#amounts">Amount conversions</a></li>
+      <li><a href="#rejected-shape">Rejected: payload shape</a></li>
+      <li><a href="#rejected-encoding">Rejected: encoding</a></li>
+      <li><a href="#rejected-ticker">Rejected: ticker</a></li>
+      <li><a href="#rejected-amount">Rejected: amount</a></li>
+      <li><a href="#rejected-deploy">Rejected: deployment and holders</a></li>
+      <li><a href="#coverage">Rule coverage</a></li>
+    </ul>
+  </nav>
+
+  <main class="doc" id="main">
+    <p class="kicker">Test vectors</p>
+    <h1>TAP test vectors</h1>
+    <p class="lede">Every vector on this page is taken from the test suite of Bitcoin Universe's TAP indexer, not invented for documentation. If your implementation agrees with all of them, it agrees with the indexer that Bitcoin Universe runs.</p>
+
+    <h2 id="how">How to read these</h2>
+    <p>Unless a vector says otherwise, the content is being checked as a TAP <code>token-transfer</code>, at inscription number 1, with a maximum content size of 8192 bytes. The decimal scale used for amount conversion is stated per vector. Rule identifiers point into the <a href="spec.html">specification</a>.</p>
+    <p>You can paste any of these into the <a href="validator.html">validator</a> and watch the same decision being made.</p>
+
+    <h2 id="accepted">Accepted vectors</h2>
+
+    <div class="vector" data-outcome="accepted">
+      <div class="vector-head"><span class="tag tag-ok">Accepted</span><h3>A-1. Whitespace, mixed case ticker, optional data</h3></div>
+      <div class="vector-body">
+        <pre><code> { "p" : "tap", "op":"token-transfer", "tick":"TÄP", "amt":"1.25", "dta":"evidence" } </code></pre>
+        <dl class="kv">
+          <dt>Indexed ticker</dt><dd><code>täp</code></dd>
+          <dt>Amount</dt><dd><code>1.25</code></dd>
+          <dt>Shows</dt><dd>Whitespace is allowed around and between tokens. The ticker is folded to NFC lower case. <code>dta</code> is accepted and carries no meaning.</dd>
+          <dt>Rules</dt><dd>EN-4, EN-14, TK-1</dd>
+        </dl>
+      </div>
+    </div>
+
+    <div class="vector" data-outcome="accepted">
+      <div class="vector-head"><span class="tag tag-ok">Accepted</span><h3>A-2. Negative inscription number</h3></div>
+      <div class="vector-body">
+        <pre><code>{"p":"tap","op":"token-transfer","tick":"tapx","amt":"1"}</code></pre>
+        <dl class="kv">
+          <dt>Inscription number</dt><dd><code>-1</code></dd>
+          <dt>Indexed ticker</dt><dd><code>-tapx</code></dd>
+          <dt>Shows</dt><dd>A cursed inscription's ticker is placed in its own namespace with a single leading hyphen, so it cannot collide with the ticker of the same name on an ordinary inscription.</dd>
+          <dt>Rules</dt><dd>TK-6, CA-6</dd>
+        </dl>
+      </div>
+    </div>
+
+    <div class="vector" data-outcome="accepted">
+      <div class="vector-head"><span class="tag tag-ok">Accepted</span><h3>A-3. Ticker at the exact UTF-16 limit</h3></div>
+      <div class="vector-body">
+        <pre><code>{"p":"tap","op":"token-transfer","tick":"😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀","amt":"1"}</code></pre>
+        <dl class="kv">
+          <dt>Ticker length</dt><dd>16 characters, 32 UTF-16 code units, 64 UTF-8 bytes</dd>
+          <dt>Shows</dt><dd>The ticker limit is measured in UTF-16 code units, not in characters. An astral character such as an emoji counts as two, so sixteen of them exactly fill the limit.</dd>
+          <dt>Rules</dt><dd>TK-2, TK-3</dd>
+        </dl>
+      </div>
+    </div>
+
+    <div class="vector" data-outcome="accepted">
+      <div class="vector-head"><span class="tag tag-ok">Accepted</span><h3>A-4. Optional data at exactly 512 UTF-8 bytes</h3></div>
+      <div class="vector-body">
+        <p>Two forms of the same limit, both accepted:</p>
+        <ul>
+          <li><code>dta</code> of 512 ASCII characters, which is 512 UTF-8 bytes.</li>
+          <li><code>dta</code> of 256 repetitions of <code>é</code>, which is also 512 UTF-8 bytes.</li>
+        </ul>
+        <dl class="kv">
+          <dt>Shows</dt><dd>The <code>dta</code> cap is measured in UTF-8 bytes, not in characters. A two byte character costs two.</dd>
+          <dt>Rules</dt><dd>EN-14</dd>
+        </dl>
+      </div>
+    </div>
+
+    <h2 id="amounts">Amount conversions</h2>
+    <p>Amounts are converted to atomic integers by string padding at the deployment's decimal scale.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th scope="col">Vector</th><th scope="col">Amount</th><th scope="col">Scale</th><th scope="col">Outcome</th></tr></thead>
+        <tbody>
+          <tr><td>A-5</td><td><code>1.25</code></td><td>4</td><td><code>12500</code></td></tr>
+          <tr><td>A-6</td><td><code>1</code></td><td>8</td><td><code>100000000</code></td></tr>
+          <tr><td>A-7</td><td><code>0</code></td><td>8</td><td><code>0</code></td></tr>
+          <tr><td>A-8</td><td><code>0</code></td><td>0</td><td><code>0</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="rejected-shape">Rejected: payload shape</h2>
+
+    <div class="vector" data-outcome="rejected">
+      <div class="vector-head"><span class="tag tag-no">Rejected</span><h3>R-1. Duplicate field</h3></div>
+      <div class="vector-body">
+        <pre><code>{"p":"tap","p":"tap","op":"token-transfer","tick":"tapx","amt":"1"}</code></pre>
+        <dl class="kv">
+          <dt>Outcome</dt><dd>Not a transfer. The field <code>p</code> appears twice.</dd>
+          <dt>Why it matters</dt><dd>A permissive JSON reader keeps the last value silently. Two implementations reading the same inscription would then disagree about what it said.</dd>
+          <dt>Rule</dt><dd>EN-7</dd>
+        </dl>
+      </div>
+    </div>
+
+    <div class="vector" data-outcome="rejected">
+      <div class="vector-head"><span class="tag tag-no">Rejected</span><h3>R-2. Unknown field</h3></div>
+      <div class="vector-body">
+        <pre><code>{"p":"tap","op":"token-transfer","tick":"tapx","amt":"1","extra":"x"}</code></pre>
+        <dl class="kv">
+          <dt>Outcome</dt><dd>Not a transfer. Only <code>p</code>, <code>op</code>, <code>tick</code>, <code>amt</code> and <code>dta</code> are permitted.</dd>
+          <dt>Rule</dt><dd>EN-8</dd>
+        </dl>
+      </div>
+    </div>
+
+    <div class="vector" data-outcome="rejected">
+      <div class="vector-head"><span class="tag tag-no">Rejected</span><h3>R-3. Nested value</h3></div>
+      <div class="vector-body">
+        <pre><code>{"p":"tap","op":"token-transfer","tick":"tapx","amt":{"value":"1"}}</code></pre>
+        <dl class="kv">
+          <dt>Outcome</dt><dd>Not a transfer. Every value must be a JSON string.</dd>
+          <dt>Rule</dt><dd>EN-6</dd>
+        </dl>
+      </div>
+    </div>
+
+    <div class="vector" data-outcome="rejected">
+      <div class="vector-head"><span class="tag tag-no">Rejected</span><h3>R-4. Numeric amount</h3></div>
+      <div class="vector-body">
+        <pre><code>{"p":"tap","op":"token-transfer","tick":"tapx","amt":1}</code></pre>
+        <dl class="kv">
+          <dt>Outcome</dt><dd>Not a transfer. A JSON number is rejected even though it looks unambiguous.</dd>
+          <dt>Why it matters</dt><dd>JSON numbers have no fixed precision. Accepting them invites two readers to disagree at the eighteenth decimal place.</dd>
+          <dt>Rules</dt><dd>EN-6, AM-3</dd>
+        </dl>
+      </div>
+    </div>
+
+    <div class="vector" data-outcome="rejected">
+      <div class="vector-head"><span class="tag tag-no">Rejected</span><h3>R-5. Trailing comma</h3></div>
+      <div class="vector-body">
+        <pre><code>{"p":"tap","op":"token-transfer","tick":"tapx","amt":"1",}</code></pre>
+        <dl class="kv">
+          <dt>Outcome</dt><dd>Not a transfer.</dd>
+          <dt>Rule</dt><dd>EN-11</dd>
+        </dl>
+      </div>
+    </div>
+
+    <div class="vector" data-outcome="rejected">
+      <div class="vector-head"><span class="tag tag-no">Rejected</span><h3>R-6. Data after the object</h3></div>
+      <div class="vector-body">
+        <pre><code>{"p":"tap","op":"token-transfer","tick":"tapx","amt":"1"}{}</code></pre>
+        <dl class="kv">
+          <dt>Outcome</dt><dd>Not a transfer. The content must be exactly one object.</dd>
+          <dt>Rule</dt><dd>EN-12</dd>
+        </dl>
+      </div>
+    </div>
+
+    <h2 id="rejected-encoding">Rejected: encoding</h2>
+
+    <div class="vector" data-outcome="rejected">
+      <div class="vector-head"><span class="tag tag-no">Rejected</span><h3>R-7. Byte order mark</h3></div>
+      <div class="vector-body">
+        <p>The bytes <code>EF BB BF</code> followed by an otherwise valid transfer:</p>
+        <pre><code>EF BB BF 7B 22 70 22 3A 22 74 61 70 22 ...</code></pre>
+        <dl class="kv">
+          <dt>Outcome</dt><dd>Not a transfer. A byte order mark is a rejection, not something to strip before parsing.</dd>
+          <dt>Why it matters</dt><dd>Text editors add one silently. Stripping it would make two byte sequences produce the same operation.</dd>
+          <dt>Rule</dt><dd>EN-2</dd>
+        </dl>
+      </div>
+    </div>
+
+    <div class="vector" data-outcome="rejected">
+      <div class="vector-head"><span class="tag tag-no">Rejected</span><h3>R-8. Not valid UTF-8</h3></div>
+      <div class="vector-body">
+        <pre><code>FF FE</code></pre>
+        <dl class="kv">
+          <dt>Outcome</dt><dd>Not a transfer. The decoder is strict and does not substitute replacement characters.</dd>
+          <dt>Rule</dt><dd>EN-3</dd>
+        </dl>
+      </div>
+    </div>
+
+    <h2 id="rejected-ticker">Rejected: ticker</h2>
+
+    <div class="vector" data-outcome="rejected">
+      <div class="vector-head"><span class="tag tag-no">Rejected</span><h3>R-9. Ticker over the UTF-16 limit</h3></div>
+      <div class="vector-body">
+        <p>A ticker of 20 astral characters, which is 20 characters but 40 UTF-16 code units:</p>
+        <pre><code>{"p":"tap","op":"token-transfer","tick":"😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀","amt":"1"}</code></pre>
+        <dl class="kv">
+          <dt>Outcome</dt><dd>Not a transfer. The ticker fails the ticker rule at 40 UTF-16 code units against a limit of 32.</dd>
+          <dt>Contrast with</dt><dd>Vector A-3, where 16 of the same character fit exactly.</dd>
+          <dt>Rule</dt><dd>TK-2</dd>
+        </dl>
+      </div>
+    </div>
+
+    <h2 id="rejected-amount">Rejected: amount</h2>
+
+    <div class="vector" data-outcome="rejected">
+      <div class="vector-head"><span class="tag tag-no">Rejected</span><h3>R-10. Leading zero</h3></div>
+      <div class="vector-body">
+        <dl class="kv">
+          <dt>Amount</dt><dd><code>01</code> at a decimal scale of 0</dd>
+          <dt>Outcome</dt><dd>Rejected. The integer part may not carry a leading zero.</dd>
+          <dt>Rule</dt><dd>AM-4</dd>
+        </dl>
+      </div>
+    </div>
+
+    <div class="vector" data-outcome="rejected">
+      <div class="vector-head"><span class="tag tag-no">Rejected</span><h3>R-11. More precision than the deployment allows</h3></div>
+      <div class="vector-body">
+        <dl class="kv">
+          <dt>Amount</dt><dd><code>1.001</code> at a decimal scale of 2</dd>
+          <dt>Outcome</dt><dd>Rejected. Three fractional digits against a scale of two. The amount is not rounded or truncated.</dd>
+          <dt>Rule</dt><dd>AM-5</dd>
+        </dl>
+      </div>
+    </div>
+
+    <div class="vector" data-outcome="rejected">
+      <div class="vector-head"><span class="tag tag-no">Rejected</span><h3>R-12. Amount supplied as a number</h3></div>
+      <div class="vector-body">
+        <dl class="kv">
+          <dt>Amount</dt><dd>The JSON number <code>1</code> at a decimal scale of 0</dd>
+          <dt>Outcome</dt><dd>Rejected. The amount converter requires an exact string.</dd>
+          <dt>Rule</dt><dd>AM-3</dd>
+        </dl>
+      </div>
+    </div>
+
+    <div class="vector" data-outcome="rejected">
+      <div class="vector-head"><span class="tag tag-no">Rejected</span><h3>R-13. Amount beyond the atomic range</h3></div>
+      <div class="vector-body">
+        <dl class="kv">
+          <dt>Amount</dt><dd>The digit <code>1</code> repeated 79 times, at a decimal scale of 0</dd>
+          <dt>Outcome</dt><dd>Rejected. The atomic value may be at most 78 digits.</dd>
+          <dt>Rule</dt><dd>AM-7</dd>
+        </dl>
+      </div>
+    </div>
+
+    <div class="vector" data-outcome="rejected">
+      <div class="vector-head"><span class="tag tag-no">Rejected</span><h3>R-14. Optional data over the byte cap</h3></div>
+      <div class="vector-body">
+        <p>Two forms of the same failure, both rejected:</p>
+        <ul>
+          <li><code>dta</code> of 257 repetitions of <code>é</code>, which is 514 UTF-8 bytes.</li>
+          <li><code>dta</code> of 513 ASCII characters, which is 513 UTF-8 bytes.</li>
+        </ul>
+        <dl class="kv">
+          <dt>Outcome</dt><dd>Rejected. The cap is 512 UTF-8 bytes, and one byte over is enough.</dd>
+          <dt>Contrast with</dt><dd>Vector A-4, where both forms land exactly on 512.</dd>
+          <dt>Rule</dt><dd>EN-14</dd>
+        </dl>
+      </div>
+    </div>
+
+    <h2 id="rejected-deploy">Rejected: deployment and holder records</h2>
+
+    <div class="vector" data-outcome="rejected">
+      <div class="vector-head"><span class="tag tag-no">Rejected</span><h3>R-15. Decimal scale out of range</h3></div>
+      <div class="vector-body">
+        <dl class="kv">
+          <dt>Declared scale</dt><dd><code>19</code></dd>
+          <dt>Outcome</dt><dd>The deployment is rejected. Token decimals must be between 0 and 18.</dd>
+          <dt>Rule</dt><dd>AM-2</dd>
+        </dl>
+      </div>
+    </div>
+
+    <div class="vector" data-outcome="rejected">
+      <div class="vector-head"><span class="tag tag-no">Rejected</span><h3>R-16. Negative holder balance</h3></div>
+      <div class="vector-body">
+        <dl class="kv">
+          <dt>Record</dt><dd>A holder row whose balance is below zero</dd>
+          <dt>Outcome</dt><dd>Rejected. A balance can never be negative, and the indexer refuses the record rather than clamping it.</dd>
+          <dt>Rule</dt><dd>AM-8</dd>
+        </dl>
+      </div>
+    </div>
+
+    <div class="vector" data-outcome="rejected">
+      <div class="vector-head"><span class="tag tag-no">Rejected</span><h3>R-17. Mixed case Bech32 address</h3></div>
+      <div class="vector-body">
+        <dl class="kv">
+          <dt>Record</dt><dd>An address that is neither wholly lower case nor wholly upper case</dd>
+          <dt>Outcome</dt><dd>Rejected. Mixed case Bech32 is invalid by construction, and the indexer will not normalise it into something acceptable.</dd>
+          <dt>Rule</dt><dd>CA-5</dd>
+        </dl>
+      </div>
+    </div>
+
+    <h2 id="coverage">Rule coverage</h2>
+    <p>Which rules these vectors exercise, and which ones need chain state rather than a payload to test.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th scope="col">Rules</th><th scope="col">Covered by</th></tr></thead>
+        <tbody>
+          <tr><td>EN-2, EN-3</td><td>R-7, R-8</td></tr>
+          <tr><td>EN-4, EN-11, EN-12</td><td>A-1, R-5, R-6</td></tr>
+          <tr><td>EN-6, EN-7, EN-8</td><td>R-1, R-2, R-3, R-4</td></tr>
+          <tr><td>EN-14</td><td>A-4, R-14</td></tr>
+          <tr><td>TK-1, TK-2, TK-3, TK-6</td><td>A-1, A-2, A-3, R-9</td></tr>
+          <tr><td>AM-2 to AM-8</td><td>A-5 to A-8, R-10 to R-13, R-15, R-16</td></tr>
+          <tr><td>CA-5</td><td>R-17</td></tr>
+          <tr><td>ST-3 to ST-7</td><td>Needs chain state. Exercise these against a live index rather than a payload.</td></tr>
+          <tr class="is-auth"><td>AU-1 to AU-5</td><td>Not covered here. Bitcoin Universe's TAP indexer does not index authority bearing operations, so this site publishes no authority vectors it cannot verify.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<footer class="pagefoot">
+  <div class="shell">
+    <div class="footgrid">
+      <dl>
+        <dt>Owning repository</dt><dd><a href="https://github.com/bitcoinuniverseio/tap">bitcoinuniverseio/tap</a></dd>
+        <dt>Source path</dt><dd><code>vectors.html</code></dd>
+        <dt>Document version</dt><dd>2.0.0</dd>
+      </dl>
+      <dl>
+        <dt>Lifecycle</dt><dd>Experimental</dd>
+        <dt>Chain and network</dt><dd>Bitcoin mainnet</dd>
+        <dt>Last verified</dt><dd><time datetime="2026-09-01">1 September 2026</time></dd>
+      </dl>
+      <dl>
+        <dt>Edit this page</dt><dd><a href="https://github.com/bitcoinuniverseio/tap/edit/main/vectors.html">on GitHub</a></dd>
+        <dt>Portal</dt><dd><a href="https://docs.bitcoinuniverse.io/">docs.bitcoinuniverse.io</a></dd>
+        <dt>Report a flaw</dt><dd><a href="https://github.com/bitcoinuniverseio/tap/security/advisories/new">Private advisory</a></dd>
+      </dl>
+    </div>
+    <p class="footnote">TAP originates in the Trac ecosystem. This documentation describes the Bitcoin mainnet profile that Bitcoin Universe indexes, and marks Bitcoin Universe specific decisions where they occur.</p>
+  </div>
+</footer>
+
+<script src="site.js" defer></script>
+</body>
+</html>

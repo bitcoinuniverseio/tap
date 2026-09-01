@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TAP documentation changelog</title>
+<meta name="description" content="Version history for the TAP protocol documentation site: what changed in each document version, and what is still open.">
+<link rel="canonical" href="https://bitcoinuniverseio.github.io/tap/changelog.html">
+<meta name="theme-color" content="#0b0e26" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f5fb" media="(prefers-color-scheme: light)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TAP documentation changelog">
+<meta property="og:description" content="Version history for the TAP protocol documentation site.">
+<meta property="og:url" content="https://bitcoinuniverseio.github.io/tap/changelog.html">
+<meta property="og:image" content="https://bitcoinuniverseio.github.io/tap/og.svg">
+<meta property="og:site_name" content="TAP protocol documentation">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="masthead">
+  <div class="shell masthead-in">
+    <a class="seal" href="index.html">
+      <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true" focusable="false">
+        <path d="M17 2.4 29.6 9.2v15.6L17 31.6 4.4 24.8V9.2Z" fill="var(--indigo-soft)" stroke="var(--indigo)" stroke-width="1.6" stroke-linejoin="round"/>
+        <path d="M10.8 17.4 15.2 22 23.2 12.6" fill="none" stroke="var(--gold-line)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>TAP<small>Protocol documentation</small></span>
+    </a>
+    <nav class="mainnav" aria-label="Documentation sections">
+      <ul>
+        <li><a href="index.html">Overview</a></li>
+        <li><a href="spec.html">Specification</a></li>
+        <li><a href="guide.html">Guide</a></li>
+        <li><a href="reference.html">Reference</a></li>
+        <li><a href="vectors.html">Test vectors</a></li>
+        <li><a href="validator.html">Validator</a></li>
+        <li><a href="changelog.html" aria-current="page">Changelog</a></li>
+      </ul>
+    </nav>
+    <div class="tools">
+      <form class="searchbox" role="search" hidden>
+        <label class="vh" for="site-search">Search this documentation</label>
+        <input id="site-search" type="search" placeholder="Search, or press /" autocomplete="off" data-base="" hidden>
+        <ul class="hitlist" id="site-search-results"></ul>
+      </form>
+      <button class="themebtn" id="theme-toggle" type="button" hidden aria-pressed="false">Dark</button>
+    </div>
+  </div>
+</header>
+
+<div class="shell frame">
+  <nav class="sidenav" aria-label="On this page">
+    <p>On this page</p>
+    <ul>
+      <li><a href="#v2">2.0.0</a></li>
+      <li><a href="#v1">1.0.0</a></li>
+      <li><a href="#policy">Versioning policy</a></li>
+      <li><a href="#open">Known gaps</a></li>
+    </ul>
+  </nav>
+
+  <main class="doc" id="main">
+    <p class="kicker">Changelog</p>
+    <h1>Documentation version history</h1>
+    <p class="lede">This changelog covers the documentation, not the TAP protocol. TAP is defined upstream in the Trac ecosystem and has its own release history.</p>
+
+    <h2 id="v2">2.0.0, 1 September 2026</h2>
+    <p>A rebuild from a short marketing site into a complete protocol dossier, with every rule traced to code that Bitcoin Universe runs.</p>
+    <ul>
+      <li>Added a normative <a href="spec.html">specification</a> with numbered rules covering the carrier, the byte level payload contract for <code>token-transfer</code>, ticker rules, decimals and amounts, the operation table with per operation fields, the authority model, state transitions and every invalidity condition.</li>
+      <li>Added a <a href="vectors.html">test vectors</a> page with accepted and rejected payloads taken from the indexer's own test suite, each mapped to the rule that decides it.</li>
+      <li>Added a client side <a href="validator.html">payload validator</a> that ports the indexer's transfer content parser.</li>
+      <li>Rewrote the <a href="guide.html">guide</a> around the two step inscribe then send transfer, with worked payloads and the failure that costs holders money.</li>
+      <li>Rewrote the <a href="reference.html">reference</a> with confirmation, mempool and reorg semantics, a concrete BRC-20 comparison, fee and size considerations, limitations, security considerations and an implementation checklist.</li>
+      <li>Replaced the general claim that TAP supports authorities with the specific, grounded statement: a deployment binds an authority through <code>prv</code>, authority bearing operations require its authorisation, and Bitcoin Universe's TAP indexer does not index them.</li>
+      <li>Recorded the support matrix from the Bitcoin Universe protocol registry and its generated capability snapshot, including the one unsupported marketplace action and its recorded reason.</li>
+      <li>Corrected the repository and site links, which previously pointed at an organisation name that does not own this repository.</li>
+      <li>Added client side search, a theme toggle, a 404 page, a sitemap, a robots file and an accurate <code>llms.txt</code>.</li>
+      <li>Rebuilt the visual language around authorisation: indigo for ordinary operations, gold reserved for authority bearing ones, with signature flow diagrams.</li>
+    </ul>
+    <p class="small">Facts preserved from version 1.0.0: TAP uses Ordinal inscriptions to create transferable token actions; deploy, mint and transfer form the foundation; a transfer becomes an inscription that is sent to its destination; TAP supports a broad character space for tickers; authorities, peer to peer trading and DMT extend the basic set; transferable inscriptions need protecting from accidental spending.</p>
+
+    <h2 id="v1">1.0.0, 12 August 2026</h2>
+    <ul>
+      <li>Initial public pages: a home page, a discovery page and a getting started page, written as an introduction rather than as a specification.</li>
+      <li>Established the accurate core claims listed above, which this version keeps.</li>
+    </ul>
+
+    <h2 id="policy">Versioning policy</h2>
+    <ul>
+      <li><strong>Major</strong> when a normative rule changes meaning, when a rule is removed, or when the document is restructured enough that rule identifiers move.</li>
+      <li><strong>Minor</strong> when rules or vectors are added without changing existing ones.</li>
+      <li><strong>Patch</strong> for corrections that do not change any rule.</li>
+      <li>Rule identifiers such as <code>EN-7</code> are stable within a major version. Vector identifiers such as <code>R-9</code> are stable within a major version.</li>
+    </ul>
+
+    <h2 id="open">Known gaps</h2>
+    <p>Stated openly rather than papered over:</p>
+    <ul>
+      <li>The authorisation format for <code>token-send</code> and the authority inscription format are not specified here at field level. They do not appear in Bitcoin Universe's code in a form this site could verify, so the upstream Trac documentation is the reference for them.</li>
+      <li>There are no authority vectors, for the same reason.</li>
+      <li>The maximum inscription content size for a transfer is a deployment configuration value rather than a fixed protocol constant, so rule EN-1 states the shape of the limit rather than a number.</li>
+      <li>Support claims cover Bitcoin Universe surfaces only. No claim is made about third party wallets, indexers or marketplaces.</li>
+    </ul>
+  </main>
+</div>
+
+<footer class="pagefoot">
+  <div class="shell">
+    <div class="footgrid">
+      <dl>
+        <dt>Owning repository</dt><dd><a href="https://github.com/bitcoinuniverseio/tap">bitcoinuniverseio/tap</a></dd>
+        <dt>Source path</dt><dd><code>changelog.html</code></dd>
+        <dt>Document version</dt><dd>2.0.0</dd>
+      </dl>
+      <dl>
+        <dt>Lifecycle</dt><dd>Experimental</dd>
+        <dt>Chain and network</dt><dd>Bitcoin mainnet</dd>
+        <dt>Last verified</dt><dd><time datetime="2026-09-01">1 September 2026</time></dd>
+      </dl>
+      <dl>
+        <dt>Edit this page</dt><dd><a href="https://github.com/bitcoinuniverseio/tap/edit/main/changelog.html">on GitHub</a></dd>
+        <dt>Portal</dt><dd><a href="https://docs.bitcoinuniverse.io/">docs.bitcoinuniverse.io</a></dd>
+        <dt>Report a flaw</dt><dd><a href="https://github.com/bitcoinuniverseio/tap/security/advisories/new">Private advisory</a></dd>
+      </dl>
+    </div>
+    <p class="footnote">TAP originates in the Trac ecosystem. This documentation describes the Bitcoin mainnet profile that Bitcoin Universe indexes, and marks Bitcoin Universe specific decisions where they occur.</p>
+  </div>
+</footer>
+
+<script src="site.js" defer></script>
+</body>
+</html>
