@@ -1,18 +1,267 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Get started with TAP Protocol — Bitcoin Universe</title>
-  <meta name="description" content="A simple, user-first path for exploring TAP Protocol safely.">
-  <meta name="theme-color" content="#09090f">
-  <link rel="stylesheet" href="styles.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TAP guide: the inscribe then send transfer, worked end to end</title>
+<meta name="description" content="A plain language walkthrough of TAP on Bitcoin: deploying a ticker, minting, and the two step inscribe then send transfer, with worked payloads and a support matrix for Bitcoin Universe surfaces.">
+<link rel="canonical" href="https://bitcoinuniverseio.github.io/tap/guide.html">
+<meta name="theme-color" content="#0b0e26" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f5fb" media="(prefers-color-scheme: light)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TAP guide: the inscribe then send transfer, worked end to end">
+<meta property="og:description" content="Deploying, minting and transferring TAP tokens on Bitcoin, step by step, with the payloads written out.">
+<meta property="og:url" content="https://bitcoinuniverseio.github.io/tap/guide.html">
+<meta property="og:image" content="https://bitcoinuniverseio.github.io/tap/og.svg">
+<meta property="og:site_name" content="TAP protocol documentation">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="styles.css">
 </head>
-<body style="--accent:#8b5cf6;--accent-2:#5eead4">
-<div class="topbar"><div class="wrap nav"><a class="brand" href="index.html"><span class="brand-mark">T</span><span>TAP Protocol</span></a><nav class="nav-links" aria-label="Main navigation"><a href="index.html">Home</a><a href="reference.html">Discover</a><a href="guide.html" aria-current="page">Get started</a><a class="nav-cta" href="https://inscribe.bitcoinuniverse.io/">Open Bitcoin Universe ↗</a></nav></div></div>
-<main>
-  <div class="wrap hero compact"><div><div class="eyebrow">Your next onchain moment</div><h1>From curiosity to <span class="gradient">confirmation.</span></h1><p class="lede">You do not need to think like a protocol engineer. Start with the story, understand the transaction, and stay in control of your wallet.</p><div class="actions"><a class="button primary" href="https://inscribe.bitcoinuniverse.io/">Open Bitcoin Universe ↗</a><a class="button secondary" href="reference.html">Discover TAP Protocol</a></div></div><div class="hero-art" aria-hidden="true"><div class="orbit"><div class="core">T</div><span class="spark one">Bitcoin</span><span class="spark two">community</span><span class="spark three">onchain</span></div></div></div>
-  <section><div class="wrap story"><div class="story-copy"><div class="eyebrow">A simple journey</div><h2>Four steps to a confident experience.</h2><p class="lede" style="font-size:18px;margin-top:22px">Every action ends with a real network transaction. Take the time to understand what your wallet shows.</p></div><div class="story-list"><article class="story-item"><b>01</b><div><h3>Explore the token</h3><p>Review its ticker, supply, mint terms, activity, and supported TAP features.</p></div></article><article class="story-item"><b>02</b><div><h3>Choose a compatible flow</h3><p>Use a wallet or service that clearly supports the exact action you want.</p></div></article><article class="story-item"><b>03</b><div><h3>Review and sign</h3><p>Confirm the inscription, amount, destination, Bitcoin fees, and any transferable being moved.</p></div></article><article class="story-item"><b>04</b><div><h3>Follow the result</h3><p>After confirmation, verify the new balance or transferable state in a compatible TAP service.</p></div></article></div></div></section>
-  <section><div class="wrap spotlight"><div class="eyebrow">Stay in control</div><h2>Your keys. Your review. Your decision.</h2><p>TAP transfers and extensions depend on compatible wallet and service support. Protect transferable inscriptions from accidental spending and verify the exact action, destination, and fees before signing.</p><div class="actions"><a class="button primary" href="https://inscribe.bitcoinuniverse.io/">Explore supported experiences ↗</a></div></div></section>
-</main>
-<footer><div class="wrap footer-inner"><span>TAP Protocol on Bitcoin</span><span>Presented by <a href="https://github.com/bitcoinuniverse/tap">Bitcoin Universe</a></span></div></footer></body></html>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="masthead">
+  <div class="shell masthead-in">
+    <a class="seal" href="index.html">
+      <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true" focusable="false">
+        <path d="M17 2.4 29.6 9.2v15.6L17 31.6 4.4 24.8V9.2Z" fill="var(--indigo-soft)" stroke="var(--indigo)" stroke-width="1.6" stroke-linejoin="round"/>
+        <path d="M10.8 17.4 15.2 22 23.2 12.6" fill="none" stroke="var(--gold-line)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>TAP<small>Protocol documentation</small></span>
+    </a>
+    <nav class="mainnav" aria-label="Documentation sections">
+      <ul>
+        <li><a href="index.html">Overview</a></li>
+        <li><a href="spec.html">Specification</a></li>
+        <li><a href="guide.html" aria-current="page">Guide</a></li>
+        <li><a href="reference.html">Reference</a></li>
+        <li><a href="vectors.html">Test vectors</a></li>
+        <li><a href="validator.html">Validator</a></li>
+        <li><a href="changelog.html">Changelog</a></li>
+      </ul>
+    </nav>
+    <div class="tools">
+      <form class="searchbox" role="search" hidden>
+        <label class="vh" for="site-search">Search this documentation</label>
+        <input id="site-search" type="search" placeholder="Search, or press /" autocomplete="off" data-base="" hidden>
+        <ul class="hitlist" id="site-search-results"></ul>
+      </form>
+      <button class="themebtn" id="theme-toggle" type="button" hidden aria-pressed="false">Dark</button>
+    </div>
+  </div>
+</header>
+
+<div class="shell frame">
+  <nav class="sidenav" aria-label="On this page">
+    <p>On this page</p>
+    <ul>
+      <li><a href="#idea">The one idea to hold on to</a></li>
+      <li><a href="#flow">The two step transfer</a></li>
+      <li><a href="#deploy">Worked example: deploy</a></li>
+      <li><a href="#mint">Worked example: mint</a></li>
+      <li><a href="#transfer">Worked example: transfer</a></li>
+      <li><a href="#authority">When a token has an authority</a></li>
+      <li><a href="#mistakes">Mistakes that cost money</a></li>
+      <li><a href="#support">What Bitcoin Universe supports</a></li>
+      <li><a href="#market">Buying and selling</a></li>
+    </ul>
+  </nav>
+
+  <main class="doc" id="main">
+    <p class="kicker">Guide</p>
+    <h1>Using TAP, from a ticker to a completed transfer</h1>
+    <p class="lede">This page walks the whole path in order, with the payloads written out. You do not need to write JSON by hand to use TAP, but seeing what your wallet is about to inscribe is the only reliable way to know what you are signing.</p>
+
+    <h2 id="idea">The one idea to hold on to</h2>
+    <p>A TAP transfer is not one action. It is two, and they can be days apart.</p>
+    <ol class="steps">
+      <li>
+        <h3>Inscribe a transfer</h3>
+        <p>You create an inscription that says "1.25 of this ticker is now transferable". The amount leaves your available balance immediately, but it has not gone anywhere. It is parked in an inscription you own.</p>
+      </li>
+      <li>
+        <h3>Send that inscription</h3>
+        <p>You send the inscription to the destination address, like sending any other ordinal. That is the moment the balance arrives, and the moment the inscription is used up.</p>
+      </li>
+    </ol>
+    <div class="warn">
+      <p><strong>Between step one and step two, the transfer inscription is an ordinary ordinal sitting in an output.</strong> A wallet that does not know about ordinals can spend it as change or as a fee, and the parked balance goes with it. Use a wallet that keeps inscriptions in a separate address and never spends them accidentally.</p>
+    </div>
+
+    <h2 id="flow">The two step transfer</h2>
+    <figure class="fig">
+      <svg viewBox="0 0 720 300" role="img" aria-labelledby="fig3t fig3d">
+        <title id="fig3t">Balance movement across the two steps of a TAP transfer</title>
+        <desc id="fig3d">The sender starts with an available balance. Inscribing a token-transfer moves the amount from available to a transferable balance bound to the new inscription, while the sender's total holding is unchanged. Sending that inscription to the recipient consumes it and credits the recipient's available balance. If the inscription is spent by accident instead of sent, the parked amount is lost with it.</desc>
+        <defs>
+          <marker id="c1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0 10 5 0 10Z" class="d-arrow"/>
+          </marker>
+        </defs>
+
+        <text x="10" y="18" class="d-text-sm">SENDER</text>
+        <rect x="10" y="28" width="180" height="76" rx="8" class="d-plain" stroke-width="1.5"/>
+        <text x="26" y="54" class="d-text">Available balance</text>
+        <text x="26" y="76" class="d-code">100.00</text>
+        <text x="26" y="94" class="d-text-sm">spendable by the holder</text>
+
+        <line x1="192" y1="66" x2="246" y2="66" class="d-flow" stroke-width="2" marker-end="url(#c1)"/>
+        <text x="196" y="56" class="d-text-sm">step 1</text>
+
+        <rect x="250" y="28" width="200" height="76" rx="8" class="d-plain" stroke-width="1.5"/>
+        <text x="266" y="54" class="d-text">Transferable balance</text>
+        <text x="266" y="76" class="d-code">1.25</text>
+        <text x="266" y="94" class="d-text-sm">bound to one inscription</text>
+
+        <line x1="452" y1="66" x2="506" y2="66" class="d-flow" stroke-width="2" marker-end="url(#c1)"/>
+        <text x="456" y="56" class="d-text-sm">step 2</text>
+
+        <text x="510" y="18" class="d-text-sm">RECIPIENT</text>
+        <rect x="510" y="28" width="200" height="76" rx="8" class="d-plain" stroke-width="1.5"/>
+        <text x="526" y="54" class="d-text">Available balance</text>
+        <text x="526" y="76" class="d-code">+1.25</text>
+        <text x="526" y="94" class="d-text-sm">credited on the send</text>
+
+        <rect x="10" y="132" width="440" height="52" rx="8" class="d-plain" stroke-width="1.5" stroke-dasharray="5 4"/>
+        <text x="26" y="154" class="d-text-sm">After step 1 the sender still holds 100.00 in total,</text>
+        <text x="26" y="172" class="d-text-sm">split as 98.75 available and 1.25 transferable.</text>
+
+        <rect x="10" y="200" width="700" height="86" rx="8" class="d-auth" stroke-width="1.5"/>
+        <text x="26" y="226" class="d-text">The gap between the steps is the risk</text>
+        <text x="26" y="248" class="d-text-sm">While the transfer inscription is unsent, it is a normal ordinal in a normal output. Spending that</text>
+        <text x="26" y="264" class="d-text-sm">output for change or fees destroys the parked amount. Sending it back to yourself is safe: the</text>
+        <text x="26" y="280" class="d-text-sm">transfer settles at your own address and the amount returns to available.</text>
+      </svg>
+      <figcaption>Step one splits the sender's holding. Step two completes the move and consumes the inscription.</figcaption>
+    </figure>
+
+    <h2 id="deploy">Worked example: deploying a ticker</h2>
+    <p>A deployment fixes the ticker, the supply cap and the per mint limit. Nothing about it can be changed afterwards.</p>
+    <pre><code>{ "p": "tap","op": "token-deploy","tick": "signal","max": "21000000","lim": "1000"}</code></pre>
+    <dl class="kv">
+      <dt><code>tick</code></dt><dd>The ticker, up to 32 UTF-16 code units. Compared after NFC normalisation and lower casing, so <code>SIGNAL</code> and <code>signal</code> are the same token.</dd>
+      <dt><code>max</code></dt><dd>The total supply cap, as an amount string.</dd>
+      <dt><code>lim</code></dt><dd>The most a single mint may claim.</dd>
+      <dt><code>prv</code></dt><dd>Optional. Naming a privilege authority inscription here is the decision that gives this ticker an authority. Leave it out and the ticker has none, permanently.</dd>
+    </dl>
+    <p class="small">The Bitcoin Universe inscribe surface accepts a ticker of three characters or of five to thirty two characters, and requires <code>max</code> and <code>lim</code> to be above zero.</p>
+
+    <h2 id="mint">Worked example: minting</h2>
+    <p>A mint claims an amount into the address that receives the inscription, within the deployment's per mint limit and remaining supply.</p>
+    <pre><code>{"p":"tap","op":"token-mint","tick":"signal","amt":"1000"}</code></pre>
+    <p>Two mints of <code>1000</code> against a <code>lim</code> of <code>1000</code> are both fine. One mint of <code>1001</code> is not an operation at all: it does not clamp to the limit, it simply does nothing.</p>
+
+    <h2 id="transfer">Worked example: transferring</h2>
+
+    <h3>Step one, inscribe the transfer</h3>
+    <pre><code>{"p":"tap","op":"token-transfer","tick":"signal","amt":"1.25"}</code></pre>
+    <p>Every character matters. The rules in <a href="spec.html#encoding">specification section 3</a> are byte level: an extra field, a repeated field, a numeric amount instead of a string, or a stray byte order mark from a text editor all mean this is not a transfer, and the amount never becomes transferable.</p>
+    <p>An optional <code>dta</code> field can carry up to 512 UTF-8 bytes of free data alongside the transfer. It has no protocol meaning, and it does not change what the transfer does.</p>
+    <pre><code>{"p":"tap","op":"token-transfer","tick":"signal","amt":"1.25","dta":"invoice 4192"}</code></pre>
+    <p>Paste either of these into the <a href="validator.html">payload validator</a> to see the checks run.</p>
+
+    <h3>Step two, send the inscription</h3>
+    <p>Send the inscription created in step one to the destination address. Once that transaction confirms, the amount is credited to the destination and the inscription is used up. Sending it a second time moves an ordinal and nothing else.</p>
+    <p>If you send it back to the address that created it, the transfer settles there: the transferable balance returns to available and the inscription is consumed. That is the ordinary way to cancel a transfer you no longer want to make.</p>
+
+    <h2 id="authority">When a token has an authority</h2>
+    <p>If a deployment named a privilege authority in <code>prv</code>, some operations on that ticker are authority bearing. The practical consequences are narrow but worth knowing:</p>
+    <ul>
+      <li>Your ordinary transfer path is untouched. Nobody needs to approve a <code>token-transfer</code> you inscribe from your own balance, and nobody can reverse it.</li>
+      <li>Minting may be gated. When a deployment has an authority, the mint body can be produced by that authority rather than by you, which is how projects run allowlists, per address caps and timed mints without a contract.</li>
+      <li>An authorised batch send exists at protocol level. One authorised payload can move balances for a list of recipients.</li>
+    </ul>
+    <div class="auth-note">
+      <p><strong>Check before you hold.</strong> Look at whether a ticker's deployment carries <code>prv</code>, and if it does, understand what that key is entitled to do. An authority is a standing trust decision baked into the deployment, and there is no way to remove it later.</p>
+    </div>
+    <p class="small">Bitcoin Universe's Bitcoin TAP indexer normalises deployments, mints, transfers and trades. It does not index authority bearing operations, so authority state is not available through Bitcoin Universe surfaces.</p>
+
+    <h2 id="mistakes">Mistakes that cost money</h2>
+    <div class="cols">
+      <div class="panel">
+        <h3>Spending a transfer inscription</h3>
+        <p>The most common and the most expensive. Between step one and step two, the parked amount lives in an ordinal. A wallet without inscription awareness will happily use it as change.</p>
+      </div>
+      <div class="panel">
+        <h3>Trusting an unconfirmed transfer</h3>
+        <p>Bitcoin Universe's TAP source has no mempool feed. A transfer with no block height is pending, not done. Do not release goods against a pending TAP transfer.</p>
+      </div>
+      <div class="panel">
+        <h3>Assuming a near miss ticker matches</h3>
+        <p>Tickers can contain emoji, punctuation and lookalike letters, and normalisation only folds case and Unicode form. Two tickers that look identical on screen can be different tokens.</p>
+      </div>
+      <div class="panel">
+        <h3>Reusing a spent transfer</h3>
+        <p>Once a transfer inscription has been sent and credited, it is consumed. Sending it on again transfers an ordinal, not a balance.</p>
+      </div>
+    </div>
+
+    <h2 id="support">What Bitcoin Universe supports</h2>
+    <p>This matrix records what the Bitcoin Universe product code implements, taken from the protocol registry and its generated capability snapshot. It is not a statement that a surface is enabled in production, which the status pages report separately. No claim is made here about wallets or marketplaces outside Bitcoin Universe.</p>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr><th scope="col">Action</th><th scope="col">Core</th><th scope="col">Wallet</th><th scope="col">Inscribe</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">View balances and activity</th><td><span class="tag tag-ok">Yes</span></td><td><span class="tag tag-ok">Yes</span></td><td class="small">Not applicable</td></tr>
+          <tr><th scope="row">Deploy a ticker</th><td class="small">Not applicable</td><td class="small">Not applicable</td><td><span class="tag tag-ok">Yes</span></td></tr>
+          <tr><th scope="row">Mint</th><td class="small">Not applicable</td><td class="small">Not applicable</td><td><span class="tag tag-ok">Yes</span></td></tr>
+          <tr><th scope="row">Inscribe a transfer</th><td class="small">Not applicable</td><td class="small">Not applicable</td><td><span class="tag tag-ok">Yes</span></td></tr>
+          <tr><th scope="row">Send and receive</th><td class="small">Not applicable</td><td><span class="tag tag-ok">Yes</span></td><td class="small">Not applicable</td></tr>
+          <tr><th scope="row">List, reprice and unlist</th><td><span class="tag tag-ok">Yes</span></td><td class="small">Not applicable</td><td class="small">Not applicable</td></tr>
+          <tr><th scope="row">Buy</th><td><span class="tag tag-ok">Yes</span></td><td class="small">Not applicable</td><td class="small">Not applicable</td></tr>
+          <tr><th scope="row">Make, accept and cancel offers</th><td><span class="tag tag-ok">Yes</span></td><td class="small">Not applicable</td><td class="small">Not applicable</td></tr>
+          <tr><th scope="row">Settle and reconcile</th><td><span class="tag tag-ok">Yes</span></td><td class="small">Not applicable</td><td class="small">Not applicable</td></tr>
+          <tr><th scope="row">Sell</th><td><span class="tag tag-no">No</span></td><td class="small">Not applicable</td><td class="small">Not applicable</td></tr>
+          <tr class="is-auth"><th scope="row">Authority bearing operations</th><td><span class="tag tag-no">No</span></td><td><span class="tag tag-no">No</span></td><td><span class="tag tag-no">No</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note">
+      <p>The registry records <code>sell</code> as unsupported for TAP with this recorded reason: <em>TAP has no executable offer workflow on this marketplace surface.</em></p>
+      <p>Everything in the Core column is behind the <code>tapMarketplaceV1</code> feature gate.</p>
+    </div>
+
+    <h2 id="market">Buying and selling</h2>
+    <p>The Bitcoin Universe marketplace treats a TAP position as one live transfer inscription. Before a listing can exist, the authority behind the marketplace has to agree with the chain about that inscription on every one of these points at the same checkpoint:</p>
+    <ul>
+      <li>the indexed row and the indexer's own reader agree on ticker, decimal scale, the inscription's amount, the address balance and the transferable balance;</li>
+      <li>the inscription content is unambiguous UTF-8 JSON for <code>tap</code> and <code>token-transfer</code>, with no duplicate and no unknown fields;</li>
+      <li>the ordinals view proves the current address, the sat offset, the complete output inventory, the tip and an unspent location;</li>
+      <li>Bitcoin Core independently proves the exact output, its script, its value, its confirmation count, its containing block and an unchanged best block;</li>
+      <li>the output holds exactly that one inscription, no runes, no special sats, and sat ranges that total exactly the output value;</li>
+      <li>an independent inventory producer proves complete coverage for all 29 marketplace protocols on that output, so nothing else is riding along on it.</li>
+    </ul>
+    <p>Settlement then requires one Bitcoin confirmation, the consumed transfer inscription and the buyer's indexed balance. The listing side has no separate confirmation threshold. If the chain reorganises, the authority appends the observation and reopens or invalidates affected orders deterministically, preserving the funding, broadcast and settlement lineage.</p>
+    <p class="small">Those checks exist because a TAP position and a rune, a rare sat or another protocol's token can all sit on the same output. A marketplace that only looks at one protocol can be made to sell more than it meant to.</p>
+  </main>
+</div>
+
+<footer class="pagefoot">
+  <div class="shell">
+    <div class="footgrid">
+      <dl>
+        <dt>Owning repository</dt><dd><a href="https://github.com/bitcoinuniverseio/tap">bitcoinuniverseio/tap</a></dd>
+        <dt>Source path</dt><dd><code>guide.html</code></dd>
+        <dt>Document version</dt><dd>2.0.0</dd>
+      </dl>
+      <dl>
+        <dt>Lifecycle</dt><dd>Experimental</dd>
+        <dt>Chain and network</dt><dd>Bitcoin mainnet</dd>
+        <dt>Last verified</dt><dd><time datetime="2026-09-01">1 September 2026</time></dd>
+      </dl>
+      <dl>
+        <dt>Edit this page</dt><dd><a href="https://github.com/bitcoinuniverseio/tap/edit/main/guide.html">on GitHub</a></dd>
+        <dt>Portal</dt><dd><a href="https://docs.bitcoinuniverse.io/">docs.bitcoinuniverse.io</a></dd>
+        <dt>Report a flaw</dt><dd><a href="https://github.com/bitcoinuniverseio/tap/security/advisories/new">Private advisory</a></dd>
+      </dl>
+    </div>
+    <p class="footnote">TAP originates in the Trac ecosystem. This documentation describes the Bitcoin mainnet profile that Bitcoin Universe indexes, and marks Bitcoin Universe specific decisions where they occur.</p>
+  </div>
+</footer>
+
+<script src="site.js" defer></script>
+</body>
+</html>

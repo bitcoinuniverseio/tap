@@ -1,23 +1,276 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>TAP Protocol — Programmable token experiences on Bitcoin</title>
-  <meta name="description" content="TAP begins with deploy, mint, and transfer, then opens into authorities, peer-to-peer experiences, mass sends, and decentralized token mechanics.">
-  <meta name="theme-color" content="#09090f">
-  <link rel="stylesheet" href="styles.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TAP on Bitcoin: inscribed tokens with delegated authority</title>
+<meta name="description" content="Authoritative documentation for the TAP inscribed token protocol on Bitcoin mainnet: operations, authority model, inscribe then send transfers, indexer semantics and test vectors, grounded in Bitcoin Universe's own indexer code.">
+<link rel="canonical" href="https://bitcoinuniverseio.github.io/tap/">
+<meta name="theme-color" content="#0b0e26" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f5fb" media="(prefers-color-scheme: light)">
+<meta property="og:type" content="website">
+<meta property="og:title" content="TAP on Bitcoin: inscribed tokens with delegated authority">
+<meta property="og:description" content="Operations, authority model, inscribe then send transfers, indexer semantics and test vectors for TAP on Bitcoin mainnet.">
+<meta property="og:url" content="https://bitcoinuniverseio.github.io/tap/">
+<meta property="og:image" content="https://bitcoinuniverseio.github.io/tap/og.svg">
+<meta property="og:site_name" content="TAP protocol documentation">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="styles.css">
 </head>
-<body style="--accent:#8b5cf6;--accent-2:#5eead4">
-<div class="topbar"><div class="wrap nav"><a class="brand" href="index.html"><span class="brand-mark">T</span><span>TAP Protocol</span></a><nav class="nav-links" aria-label="Main navigation"><a href="index.html" aria-current="page">Home</a><a href="reference.html">Discover</a><a href="guide.html">Get started</a><a class="nav-cta" href="https://inscribe.bitcoinuniverse.io/">Open Bitcoin Universe ↗</a></nav></div></div>
-<main>
-  <div class="wrap hero">
-    <div><div class="eyebrow">Programmable token experiences on Bitcoin</div><h1>Make tokens move with imagination<span class="gradient">.</span></h1><p class="lede">TAP begins with deploy, mint, and transfer, then opens into authorities, peer-to-peer experiences, mass sends, and decentralized token mechanics.</p><div class="actions"><a class="button primary" href="guide.html">Start your journey →</a><a class="button secondary" href="reference.html">Discover how it works</a></div></div>
-    <div class="hero-art" aria-hidden="true"><div class="orbit"><div class="core">T</div><span class="spark one">Bitcoin</span><span class="spark two">community</span><span class="spark three">onchain</span></div></div>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="masthead">
+  <div class="shell masthead-in">
+    <a class="seal" href="index.html">
+      <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true" focusable="false">
+        <path d="M17 2.4 29.6 9.2v15.6L17 31.6 4.4 24.8V9.2Z" fill="var(--indigo-soft)" stroke="var(--indigo)" stroke-width="1.6" stroke-linejoin="round"/>
+        <path d="M10.8 17.4 15.2 22 23.2 12.6" fill="none" stroke="var(--gold-line)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>TAP<small>Protocol documentation</small></span>
+    </a>
+    <nav class="mainnav" aria-label="Documentation sections">
+      <ul>
+        <li><a href="index.html" aria-current="page">Overview</a></li>
+        <li><a href="spec.html">Specification</a></li>
+        <li><a href="guide.html">Guide</a></li>
+        <li><a href="reference.html">Reference</a></li>
+        <li><a href="vectors.html">Test vectors</a></li>
+        <li><a href="validator.html">Validator</a></li>
+        <li><a href="changelog.html">Changelog</a></li>
+      </ul>
+    </nav>
+    <div class="tools">
+      <form class="searchbox" role="search" hidden>
+        <label class="vh" for="site-search">Search this documentation</label>
+        <input id="site-search" type="search" placeholder="Search, or press /" autocomplete="off" data-base="" hidden>
+        <ul class="hitlist" id="site-search-results"></ul>
+      </form>
+      <button class="themebtn" id="theme-toggle" type="button" hidden aria-pressed="false">Dark</button>
+    </div>
   </div>
-  <div class="band"><div class="wrap band-inner"><strong>Simple at the start. Expansive by design.</strong><span>Built for curious humans, collectors, creators, and communities.</span></div></div>
-  <section><div class="wrap"><div class="section-head"><div><div class="eyebrow">Why it matters</div><h2>More than a ticker and a balance.</h2></div><p>TAP uses Ordinal inscriptions to create transferable token actions. Its broader feature set lets compatible experiences add richer coordination around those assets.</p></div><div class="grid"><article class="card"><span class="num">01 / EXPERIENCE</span><h3>Launch</h3><p>Create a token identity and define its supply and mint personality.</p></article><article class="card"><span class="num">02 / EXPERIENCE</span><h3>Collect</h3><p>Mint under the token’s terms and hold it in a compatible wallet.</p></article><article class="card"><span class="num">03 / EXPERIENCE</span><h3>Connect</h3><p>Transfer, coordinate, and explore richer TAP-enabled experiences.</p></article></div></div></section>
-  <section><div class="wrap spotlight"><div class="eyebrow">The protocol in plain language</div><h2>A clear idea with an onchain heartbeat.</h2><p>TAP uses Ordinal inscriptions to create transferable token actions. Its broader feature set lets compatible experiences add richer coordination around those assets.</p><div class="fact-list" style="margin-top:34px"><div class="fact"><strong>Basic actions</strong><span>Deploy, mint, and transfer form the familiar TAP foundation.</span></div><div class="fact"><strong>Transferables</strong><span>A transfer becomes an inscription that is sent to its destination.</span></div><div class="fact"><strong>Expressive tickers</strong><span>TAP supports a broad visual character space for identities.</span></div><div class="fact"><strong>Extensions</strong><span>Compatible experiences can add authorities, P2P, DMT, and more.</span></div></div></div></section>
-  <section><div class="wrap"><div class="spotlight"><div class="eyebrow">Ready to explore?</div><h2>See what your next Bitcoin Universe moment can become.</h2><p>Explore supported experiences, connect a wallet when you are ready, and review every transaction before it leaves your hands.</p><div class="actions"><a class="button primary" href="https://inscribe.bitcoinuniverse.io/">Open Bitcoin Universe ↗</a><a class="button secondary" href="guide.html">See the journey</a></div></div></div></section>
-</main>
-<footer><div class="wrap footer-inner"><span>TAP Protocol on Bitcoin</span><span>Presented by <a href="https://github.com/bitcoinuniverse/tap">Bitcoin Universe</a></span></div></footer></body></html>
+</header>
+
+<div class="shell frame">
+  <nav class="sidenav" aria-label="On this page">
+    <p>On this page</p>
+    <ul>
+      <li><a href="#what">What TAP is</a></li>
+      <li><a href="#authority">Authority in one picture</a></li>
+      <li><a href="#who">Who this is for</a></li>
+      <li><a href="#facts">Protocol facts</a></li>
+      <li><a href="#operations">Operations at a glance</a></li>
+      <li><a href="#universe">Support in Bitcoin Universe</a></li>
+      <li><a href="#related">Related protocols</a></li>
+      <li><a href="#start">Where to start</a></li>
+      <li><a href="#security">Reporting a problem</a></li>
+    </ul>
+  </nav>
+
+  <main class="doc" id="main">
+    <div class="hero">
+      <p class="kicker">Bitcoin mainnet, inscribed tokens</p>
+      <h1>TAP: inscribed tokens that can delegate authority</h1>
+      <p class="lede">TAP is an inscribed token protocol from the Trac ecosystem. It keeps the familiar deploy, mint and two step transfer of an inscribed token, and adds something those protocols do not have: a token can name an authority, and some operations only count when that authority has signed for them.</p>
+      <ul class="stamp">
+        <li>Chain <b>Bitcoin</b></li>
+        <li>Network <b>mainnet</b></li>
+        <li>Protocol tag <b><code>tap</code></b></li>
+        <li>Carrier <b>Ordinal inscriptions</b></li>
+        <li>Lifecycle <b>Experimental</b></li>
+        <li>Document version <b>2.0.0</b></li>
+      </ul>
+      <div class="cta">
+        <a class="btn btn-solid" href="spec.html">Read the specification</a>
+        <a class="btn btn-line" href="validator.html">Check a payload</a>
+      </div>
+    </div>
+
+    <h2 id="what">What TAP is</h2>
+    <p>A TAP token lives entirely in Ordinal inscriptions. There is no contract and no sidechain. Every action is a small JSON object inscribed on a satoshi, tagged with <code>"p": "tap"</code>. Indexers read those inscriptions in block order and agree on the resulting balances.</p>
+    <p>TAP did not originate at Bitcoin Universe. It comes from the Trac ecosystem, and this site documents the protocol as the ecosystem uses it, with every rule on this site traced to code that Bitcoin Universe runs. Where an indexing decision is specific to Bitcoin Universe rather than to TAP itself, it is labelled as such.</p>
+    <p>Two properties separate TAP from the inscribed token protocols it grew out of:</p>
+    <ul>
+      <li><strong>A wider ticker space.</strong> A TAP ticker can be up to 32 UTF-16 code units and 128 UTF-8 bytes, so it can hold words, punctuation and emoji rather than a four character tag.</li>
+      <li><strong>Delegated authority.</strong> A deployment can name a privilege authority inscription. Once it does, privileged operations on that ticker are only meaningful when that authority has authorised them.</li>
+    </ul>
+
+    <h2 id="authority">Authority in one picture</h2>
+    <p>Most of what happens on a TAP token is ordinary: anybody holding a balance can transfer it, and anybody can mint while a mint is open. A smaller set of operations is authority bearing. Throughout this site, ordinary operations are drawn in indigo and authority bearing operations in gold.</p>
+
+    <figure class="fig">
+      <svg viewBox="0 0 720 300" role="img" aria-labelledby="fig1t fig1d">
+        <title id="fig1t">Ordinary and authority bearing paths to indexed TAP state</title>
+        <desc id="fig1d">Two paths lead to the same indexed token state. On the ordinary path a holder inscribes a token-transfer and sends the inscription, and the indexer accepts it on the strength of the inscription content and its current location. On the authority path a deployment names a privilege authority inscription, that authority signs an operation body, and only then does the indexer treat the operation as effective. Ordinary elements are drawn in indigo, authority bearing elements in gold.</desc>
+        <defs>
+          <marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0 10 5 0 10Z" class="d-arrow"/>
+          </marker>
+          <marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0 10 5 0 10Z" class="d-arrow-auth"/>
+          </marker>
+        </defs>
+
+        <text x="8" y="20" class="d-text-sm">ORDINARY PATH</text>
+        <rect x="8" y="30" width="150" height="62" rx="8" class="d-plain" stroke-width="1.5"/>
+        <text x="22" y="55" class="d-text">Holder</text>
+        <text x="22" y="74" class="d-text-sm">holds a balance</text>
+
+        <rect x="200" y="30" width="176" height="62" rx="8" class="d-plain" stroke-width="1.5"/>
+        <text x="214" y="55" class="d-code">token-transfer</text>
+        <text x="214" y="74" class="d-text-sm">inscribed, then sent</text>
+
+        <line x1="160" y1="61" x2="196" y2="61" class="d-flow" stroke-width="2" marker-end="url(#a1)"/>
+        <line x1="378" y1="61" x2="470" y2="120" class="d-flow" stroke-width="2" marker-end="url(#a1)"/>
+
+        <text x="8" y="150" class="d-text-sm">AUTHORITY PATH</text>
+        <rect x="8" y="160" width="150" height="62" rx="8" class="d-auth" stroke-width="1.5"/>
+        <text x="22" y="185" class="d-text">Deployment</text>
+        <text x="22" y="204" class="d-code">prv names authority</text>
+
+        <rect x="200" y="160" width="176" height="62" rx="8" class="d-auth" stroke-width="1.5"/>
+        <text x="214" y="185" class="d-text">Token authority</text>
+        <text x="214" y="204" class="d-text-sm">signs the operation body</text>
+
+        <line x1="160" y1="191" x2="196" y2="191" class="d-flow-auth" stroke-width="2" marker-end="url(#a2)"/>
+        <line x1="378" y1="191" x2="470" y2="152" class="d-flow-auth" stroke-width="2" marker-end="url(#a2)"/>
+
+        <rect x="474" y="96" width="238" height="80" rx="8" class="d-plain" stroke-width="1.5"/>
+        <text x="490" y="126" class="d-text">Indexed token state</text>
+        <text x="490" y="146" class="d-text-sm">balances, transferables, holders</text>
+        <text x="490" y="164" class="d-text-sm">agreed by every TAP indexer</text>
+
+        <rect x="200" y="248" width="512" height="42" rx="8" class="d-plain" stroke-width="1.5" stroke-dasharray="5 4"/>
+        <text x="214" y="266" class="d-text-sm">An operation that fails any content rule is not an operation at all.</text>
+        <text x="214" y="282" class="d-text-sm">Nothing moves, and no error is recorded on chain.</text>
+      </svg>
+      <figcaption>Ordinary operations stand on their own content and location. Authority bearing operations additionally need a signature from the authority the deployment named.</figcaption>
+    </figure>
+
+    <ul class="legend">
+      <li><span class="sw" aria-hidden="true"></span> Ordinary operation, no authority needed</li>
+      <li><span class="sw sw-auth" aria-hidden="true"></span> Authority bearing operation</li>
+    </ul>
+
+    <h2 id="who">Who this is for</h2>
+    <div class="cols">
+      <div class="panel">
+        <h3>Token holders</h3>
+        <p>You need to know that a TAP transfer takes two steps, and that the inscription created by step one is spendable like any other ordinal. The <a href="guide.html">guide</a> walks it through.</p>
+      </div>
+      <div class="panel">
+        <h3>Application developers</h3>
+        <p>You need the exact payload contract and the indexer's confirmation and reorg behaviour. Start with the <a href="spec.html">specification</a> and the <a href="reference.html">reference</a>.</p>
+      </div>
+      <div class="panel">
+        <h3>Indexer implementers</h3>
+        <p>You need reject conditions you can test. The <a href="vectors.html">test vectors</a> are taken from the test suite of Bitcoin Universe's own TAP indexer.</p>
+      </div>
+    </div>
+
+    <h2 id="facts">Protocol facts</h2>
+    <div class="tablewrap">
+      <table>
+        <caption>Values pinned by Bitcoin Universe's TAP indexer and protocol registry.</caption>
+        <tbody>
+          <tr><th scope="row">Origin</th><td>The Trac ecosystem. TAP is an upstream protocol that Bitcoin Universe indexes, not a Bitcoin Universe invention.</td></tr>
+          <tr><th scope="row">Chain and network</th><td>Bitcoin, mainnet. The indexer refuses to start against any other network.</td></tr>
+          <tr><th scope="row">Protocol tag</th><td><code>"p": "tap"</code>, exact and lower case.</td></tr>
+          <tr><th scope="row">Carrier</th><td>Ordinal inscriptions. Bitcoin Universe's inscribe flow writes TAP payloads as <code>text/plain;charset=utf-8</code>.</td></tr>
+          <tr><th scope="row">Ownership model</th><td>Hybrid: balances are held per address, and a pending transfer is bound to a specific inscription and its output.</td></tr>
+          <tr><th scope="row">Address roles</th><td>Payment and ordinals.</td></tr>
+          <tr><th scope="row">Ticker limits</th><td>Up to 32 UTF-16 code units and 128 UTF-8 bytes, in NFC lower case form, with no Unicode control, format or separator characters.</td></tr>
+          <tr><th scope="row">Decimal scale</th><td>The indexer accepts a declared scale of 0 to 18 and converts by string padding, never by floating point arithmetic.</td></tr>
+          <tr><th scope="row">Source coverage</th><td><code>partial</code>. Confirmed state is complete; there is no mempool feed.</td></tr>
+          <tr><th scope="row">Marketplace</th><td>Feature gated behind <code>tapMarketplaceV1</code>, executed in app, settling at one Bitcoin confirmation.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="operations">Operations at a glance</h2>
+    <p>The full table with per operation field requirements is in the <a href="spec.html#operations">specification</a>. This is the shape of it.</p>
+    <div class="tablewrap">
+      <table>
+        <caption>Rows shaded gold are authority bearing.</caption>
+        <thead>
+          <tr><th scope="col">Operation</th><th scope="col">Does</th><th scope="col">Authority</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>token-deploy</code></td><td>Creates a ticker with a supply cap and a per mint limit</td><td>Optional, through <code>prv</code></td></tr>
+          <tr><td><code>token-mint</code></td><td>Mints into an address under the deployment's terms</td><td>Optional, set by the deployment</td></tr>
+          <tr><td><code>token-transfer</code></td><td>Step one of a transfer, makes an amount transferable</td><td class="small">None</td></tr>
+          <tr class="is-auth"><td><code>token-send</code></td><td>Moves balances for a list of items in one payload</td><td><span class="tag tag-auth">Required</span></td></tr>
+          <tr class="is-auth"><td><code>dmt-deploy</code></td><td>Digital Matter Theory deployment on the <code>tap</code> tag</td><td><span class="tag tag-auth">Required</span></td></tr>
+          <tr><td><code>dmt-mint</code></td><td>Digital Matter Theory mint on the <code>tap</code> tag</td><td class="small">None</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="universe">Support in Bitcoin Universe</h2>
+    <p>Bitcoin Universe runs a TAP indexer and exposes TAP in three product surfaces. The table records what the product code implements. It is not a promise that a surface is switched on in production, which the status pages report separately.</p>
+    <div class="tablewrap">
+      <table>
+        <caption>Recorded in the Bitcoin Universe protocol registry and its generated capability snapshot.</caption>
+        <thead>
+          <tr><th scope="col">Surface</th><th scope="col">Actions</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Core</th><td>view, discover, view collection, view activity, view transaction, list, update listing, unlist, buy, make offer, accept offer, cancel offer, settle, reconcile</td></tr>
+          <tr><th scope="row">Wallet</th><td>view, send, receive</td></tr>
+          <tr><th scope="row">Inscribe</th><td>deploy, mint, transfer</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note">
+      <p><strong>One marketplace action is not supported.</strong> The registry records <code>sell</code> as unsupported for TAP with this recorded reason:</p>
+      <p><em>TAP has no executable offer workflow on this marketplace surface.</em></p>
+    </div>
+
+    <h2 id="related">Related protocols</h2>
+    <ul class="linklist">
+      <li><a href="https://bitcoinuniverseio.github.io/tap-on-doge/">TAP on Doge</a><span>The Dogecoin variant of TAP, documented in its own repository. It is a separate chain with its own indexing and its own marketplace behaviour, so nothing on this site carries over to it.</span></li>
+      <li><a href="https://docs.bitcoinuniverse.io/">docs.bitcoinuniverse.io</a><span>The central documentation portal, which ingests this repository along with every other Bitcoin Universe protocol and product.</span></li>
+      <li><a href="https://docs.tap-protocol.com/">docs.tap-protocol.com</a><span>Upstream TAP documentation from the Trac ecosystem, covering operations beyond the ones Bitcoin Universe indexes.</span></li>
+    </ul>
+
+    <h2 id="start">Where to start</h2>
+    <ul class="linklist">
+      <li><a href="spec.html">Specification</a><span>Numbered rules: payload encoding, ticker rules, amounts, the operation table, state transitions and every condition that makes a payload invalid.</span></li>
+      <li><a href="guide.html">Guide</a><span>The inscribe then send flow, worked end to end, plus what each Bitcoin Universe surface can actually do.</span></li>
+      <li><a href="reference.html">Reference</a><span>Terminology, indexer semantics, the concrete differences from BRC-20, fees, limitations, security considerations and an implementation checklist.</span></li>
+      <li><a href="vectors.html">Test vectors</a><span>Accepted and rejected payloads with the exact reason for each outcome.</span></li>
+      <li><a href="validator.html">Payload validator</a><span>Paste a TAP payload and see what it is, whether it holds up and whether it needs an authority. It runs in your browser.</span></li>
+    </ul>
+
+    <h2 id="security">Reporting a problem</h2>
+    <p>If you find a flaw in this documentation, or a way that a Bitcoin Universe TAP surface can be made to disagree with the chain, report it privately through <a href="https://github.com/bitcoinuniverseio/tap/security/advisories/new">GitHub private vulnerability reporting</a> rather than in a public issue. <a href="https://github.com/bitcoinuniverseio/tap/blob/main/SECURITY.md">SECURITY.md</a> has the details.</p>
+  </main>
+</div>
+
+<footer class="pagefoot">
+  <div class="shell">
+    <div class="footgrid">
+      <dl>
+        <dt>Owning repository</dt><dd><a href="https://github.com/bitcoinuniverseio/tap">bitcoinuniverseio/tap</a></dd>
+        <dt>Source path</dt><dd><code>index.html</code></dd>
+        <dt>Document version</dt><dd>2.0.0</dd>
+      </dl>
+      <dl>
+        <dt>Lifecycle</dt><dd>Experimental</dd>
+        <dt>Chain and network</dt><dd>Bitcoin mainnet</dd>
+        <dt>Last verified</dt><dd><time datetime="2026-09-01">1 September 2026</time></dd>
+      </dl>
+      <dl>
+        <dt>Edit this page</dt><dd><a href="https://github.com/bitcoinuniverseio/tap/edit/main/index.html">on GitHub</a></dd>
+        <dt>Portal</dt><dd><a href="https://docs.bitcoinuniverse.io/">docs.bitcoinuniverse.io</a></dd>
+        <dt>Report a flaw</dt><dd><a href="https://github.com/bitcoinuniverseio/tap/security/advisories/new">Private advisory</a></dd>
+      </dl>
+    </div>
+    <p class="footnote">TAP originates in the Trac ecosystem. This documentation describes the Bitcoin mainnet profile that Bitcoin Universe indexes, and marks Bitcoin Universe specific decisions where they occur.</p>
+  </div>
+</footer>
+
+<script src="site.js" defer></script>
+</body>
+</html>

@@ -1,19 +1,333 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Discover TAP Protocol — Bitcoin Universe</title>
-  <meta name="description" content="A plain-language look at TAP Protocol and its onchain experience.">
-  <meta name="theme-color" content="#09090f">
-  <link rel="stylesheet" href="styles.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TAP reference: indexer semantics, differences from BRC-20, checklist</title>
+<meta name="description" content="TAP reference for Bitcoin mainnet: terminology, confirmation and mempool and reorg behaviour, how TAP differs from BRC-20 in concrete terms, fee and size considerations, limitations, security considerations and an implementation checklist.">
+<link rel="canonical" href="https://bitcoinuniverseio.github.io/tap/reference.html">
+<meta name="theme-color" content="#0b0e26" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f5fb" media="(prefers-color-scheme: light)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TAP reference: indexer semantics, differences from BRC-20, checklist">
+<meta property="og:description" content="Confirmation, mempool and reorg behaviour, concrete BRC-20 differences, limitations and an implementation checklist for TAP.">
+<meta property="og:url" content="https://bitcoinuniverseio.github.io/tap/reference.html">
+<meta property="og:image" content="https://bitcoinuniverseio.github.io/tap/og.svg">
+<meta property="og:site_name" content="TAP protocol documentation">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="styles.css">
 </head>
-<body style="--accent:#8b5cf6;--accent-2:#5eead4">
-<div class="topbar"><div class="wrap nav"><a class="brand" href="index.html"><span class="brand-mark">T</span><span>TAP Protocol</span></a><nav class="nav-links" aria-label="Main navigation"><a href="index.html">Home</a><a href="reference.html" aria-current="page">Discover</a><a href="guide.html">Get started</a><a class="nav-cta" href="https://inscribe.bitcoinuniverse.io/">Open Bitcoin Universe ↗</a></nav></div></div>
-<main>
-  <div class="wrap hero compact"><div><div class="eyebrow">Discover TAP Protocol</div><h1>See the idea behind the <span class="gradient">transaction.</span></h1><p class="lede">TAP uses Ordinal inscriptions to create transferable token actions. Its broader feature set lets compatible experiences add richer coordination around those assets.</p><div class="actions"><a class="button primary" href="guide.html">Get started →</a><a class="button secondary" href="index.html">Back home</a></div></div><div class="hero-art" aria-hidden="true"><div class="orbit"><div class="core">T</div><span class="spark one">Bitcoin</span><span class="spark two">community</span><span class="spark three">onchain</span></div></div></div>
-  <section><div class="wrap"><div class="section-head"><div><div class="eyebrow">How it comes together</div><h2>Four ideas. One connected experience.</h2></div><p>Protocol details matter most when they help you understand what you are about to create, collect, or send.</p></div><div class="grid" style="grid-template-columns:repeat(2,minmax(0,1fr))"><article class="card"><span class="num">01 / IDEA</span><h3>Basic actions</h3><p>Deploy, mint, and transfer form the familiar TAP foundation.</p></article><article class="card"><span class="num">02 / IDEA</span><h3>Transferables</h3><p>A transfer becomes an inscription that is sent to its destination.</p></article><article class="card"><span class="num">03 / IDEA</span><h3>Expressive tickers</h3><p>TAP supports a broad visual character space for identities.</p></article><article class="card"><span class="num">04 / IDEA</span><h3>Extensions</h3><p>Compatible experiences can add authorities, P2P, DMT, and more.</p></article></div></div></section>
-  <section><div class="wrap spotlight"><div class="eyebrow">Keep the meaning clear</div><h2>Bitcoin confirms the transaction. Compatible services reveal the experience.</h2><p>TAP transfers and extensions depend on compatible wallet and service support. Protect transferable inscriptions from accidental spending and verify the exact action, destination, and fees before signing.</p></div></section>
-  <section><div class="wrap"><div class="section-head"><div><div class="eyebrow">Explore the ecosystem</div><h2>Follow the story further.</h2></div><p>These community resources offer more context around the protocol and the world growing around it.</p></div><div class="source-list"><a class="source" href="https://docs.tap-protocol.com/" target="_blank" rel="noreferrer"><span>Explore TAP</span><span>Visit ↗</span></a><a class="source" href="https://docs.tap-protocol.com/functions/quickstart" target="_blank" rel="noreferrer"><span>See TAP’s core experiences</span><span>Visit ↗</span></a></div></div></section>
-</main>
-<footer><div class="wrap footer-inner"><span>TAP Protocol on Bitcoin</span><span>Presented by <a href="https://github.com/bitcoinuniverse/tap">Bitcoin Universe</a></span></div></footer></body></html>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="masthead">
+  <div class="shell masthead-in">
+    <a class="seal" href="index.html">
+      <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true" focusable="false">
+        <path d="M17 2.4 29.6 9.2v15.6L17 31.6 4.4 24.8V9.2Z" fill="var(--indigo-soft)" stroke="var(--indigo)" stroke-width="1.6" stroke-linejoin="round"/>
+        <path d="M10.8 17.4 15.2 22 23.2 12.6" fill="none" stroke="var(--gold-line)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>TAP<small>Protocol documentation</small></span>
+    </a>
+    <nav class="mainnav" aria-label="Documentation sections">
+      <ul>
+        <li><a href="index.html">Overview</a></li>
+        <li><a href="spec.html">Specification</a></li>
+        <li><a href="guide.html">Guide</a></li>
+        <li><a href="reference.html" aria-current="page">Reference</a></li>
+        <li><a href="vectors.html">Test vectors</a></li>
+        <li><a href="validator.html">Validator</a></li>
+        <li><a href="changelog.html">Changelog</a></li>
+      </ul>
+    </nav>
+    <div class="tools">
+      <form class="searchbox" role="search" hidden>
+        <label class="vh" for="site-search">Search this documentation</label>
+        <input id="site-search" type="search" placeholder="Search, or press /" autocomplete="off" data-base="" hidden>
+        <ul class="hitlist" id="site-search-results"></ul>
+      </form>
+      <button class="themebtn" id="theme-toggle" type="button" hidden aria-pressed="false">Dark</button>
+    </div>
+  </div>
+</header>
+
+<div class="shell frame">
+  <nav class="sidenav" aria-label="On this page">
+    <p>On this page</p>
+    <ul>
+      <li><a href="#terms">Terminology</a></li>
+      <li><a href="#indexer">Indexer semantics</a></li>
+      <li><a href="#confirmation">Confirmation states</a></li>
+      <li><a href="#reorg">Reorg behaviour</a></li>
+      <li><a href="#brc20">How TAP differs from BRC-20</a></li>
+      <li><a href="#fees">Fees and size</a></li>
+      <li><a href="#limits">Limitations</a></li>
+      <li><a href="#security">Security considerations</a></li>
+      <li><a href="#checklist">Implementation checklist</a></li>
+    </ul>
+  </nav>
+
+  <main class="doc" id="main">
+    <p class="kicker">Reference</p>
+    <h1>TAP reference</h1>
+    <p class="lede">Terminology, the exact behaviour of Bitcoin Universe's TAP indexer around confirmation, mempool and reorgs, the concrete differences from BRC-20, and a checklist for anyone building against TAP.</p>
+
+    <h2 id="terms">Terminology</h2>
+    <div class="tablewrap">
+      <table>
+        <tbody>
+          <tr><th scope="row">Available balance</th><td>The part of an address's holding that can be spent by inscribing a new transfer.</td></tr>
+          <tr><th scope="row">Transferable balance</th><td>The part parked in live transfer inscriptions. It counts toward the holder's total but cannot be transferred again until the inscription is sent.</td></tr>
+          <tr><th scope="row">Transfer inscription</th><td>An inscription whose content is a valid <code>token-transfer</code>. Live until sent, consumed afterwards.</td></tr>
+          <tr><th scope="row">Consumed</th><td>A transfer inscription that has been sent and credited. It is spent for protocol purposes even though the ordinal still exists.</td></tr>
+          <tr><th scope="row">Privilege authority</th><td>The inscription named by a deployment's <code>prv</code> field, holding the key that authorises privileged operations on that ticker.</td></tr>
+          <tr><th scope="row">Authority bearing</th><td>An operation that only takes effect with a valid authorisation from the ticker's privilege authority.</td></tr>
+          <tr><th scope="row">Atomic amount</th><td>An amount as an integer at the deployment's decimal scale, with no decimal point. Always produced by string padding.</td></tr>
+          <tr><th scope="row">Cursed inscription</th><td>An inscription with a negative inscription number. Its ticker sits in a namespace prefixed with <code>-</code>.</td></tr>
+          <tr><th scope="row">Quarantine</th><td>An indexer state for a source row that cannot be interpreted safely yet, held rather than guessed at.</td></tr>
+          <tr><th scope="row">Checkpoint</th><td>A height and block hash that a read is pinned to. Reads are bracketed by checkpoint agreement so that two observations can never be mixed.</td></tr>
+          <tr><th scope="row">DMT</th><td>Digital Matter Theory. A distinct asset family carried on the <code>tap</code> protocol tag, indexed separately.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="indexer">Indexer semantics</h2>
+    <p>Bitcoin Universe reads confirmed TAP state from an authenticated writer it operates itself, and publishes normalised batches. The behaviour below is that indexer's, not a property of TAP.</p>
+
+    <h3>Identity pinning</h3>
+    <p>The service pins its protocol, chain, network, writer identity, writer version and writer revision. It refuses to start if the configured identity differs from the code, and it stores an identity hash in its database so that a database built for another source, network, writer revision or writer version cannot be opened. Every read is bracketed by authenticated block digest checks, so a height advance or a same height block replacement aborts the operation instead of mixing two states.</p>
+
+    <h3>Ordering and replay</h3>
+    <p>Each source list has a durable offset. The raw row fingerprint, the normalised event and the output journal sequence are all stored, so replaying the same source row does not create a second event. Output cursors bind the journal sequence to the source identity, and new journal rows never change the content of an older page.</p>
+
+    <h3>Holding back rather than guessing</h3>
+    <ul>
+      <li>Activity for a ticker with no known deployment waits until the deployment stream has been read to its current length. Still absent, the row is quarantined instead of being scaled with a guessed decimal scale. A later deployment rewinds and retries it.</li>
+      <li>A raw source record is capped at 256 KiB. An oversized row keeps its SHA-256 fingerprint and byte count, is quarantined, and is never interpreted.</li>
+      <li>Holder snapshots are staged against one pinned height and hash, with an exact holder count check, and published as a manifest with ordered chunks. Reopening a snapshot job fails if the writer has advanced, so a snapshot can never mix heights.</li>
+    </ul>
+
+    <h3>Addresses</h3>
+    <p>The source contract is Bitcoin mainnet only. A mixed case Bech32 string is rejected. Where a legacy holder row uses another valid Bitcoin network encoding, the indexer derives the identical output script and re-encodes that script as a mainnet address rather than guessing. Invalid checksums and malformed addresses fail closed. Addresses supplied by users on marketplace paths are strictly mainnet and are never rewritten.</p>
+
+    <h2 id="confirmation">Confirmation states</h2>
+    <div class="tablewrap">
+      <table>
+        <caption>How a source row becomes a confirmation state.</caption>
+        <thead><tr><th scope="col">Evidence</th><th scope="col">State</th></tr></thead>
+        <tbody>
+          <tr><td>A status of pending, unconfirmed or mempool</td><td><code>pending</code></td></tr>
+          <tr><td>A confirmed flag that is false or zero</td><td><code>pending</code></td></tr>
+          <tr><td>No block height</td><td><code>pending</code></td></tr>
+          <tr><td>A block height present</td><td><code>confirmed</code></td></tr>
+          <tr><td>A status of reverted, invalid, orphaned or reorged</td><td><code>reverted</code></td></tr>
+          <tr><td>A status of failed, rejected or error</td><td><code>failed</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="warn">
+      <p><strong>Pending does not mean seen in the mempool.</strong> Source coverage is recorded as <code>partial</code> with this reason: <em>The Universe-operated TAP writer provides confirmed indexed state and authenticated block digests but no pending mempool feed. Tail checks detect confirmed replacements visible in writer lists.</em> A consumer must not present TAP pending state as mempool visibility.</p>
+    </div>
+
+    <figure class="fig">
+      <svg viewBox="0 0 720 220" role="img" aria-labelledby="fig4t fig4d">
+        <title id="fig4t">Confirmation state transitions for an indexed TAP event</title>
+        <desc id="fig4d">An observed row without block evidence is pending. With a block height it becomes confirmed. Replacement evidence from a tail check moves a confirmed event to reverted, and an explicit failure status marks it failed. A reverted event that reappears keeps its source event id and is reactivated with a new journal entry.</desc>
+        <defs>
+          <marker id="d1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0 10 5 0 10Z" class="d-arrow"/>
+          </marker>
+        </defs>
+        <rect x="14" y="74" width="140" height="56" rx="8" class="d-plain" stroke-width="1.5"/>
+        <text x="30" y="100" class="d-code">pending</text>
+        <text x="30" y="119" class="d-text-sm">no block evidence</text>
+
+        <line x1="156" y1="102" x2="212" y2="102" class="d-flow" stroke-width="2" marker-end="url(#d1)"/>
+        <text x="158" y="93" class="d-text-sm">block height</text>
+
+        <rect x="216" y="74" width="150" height="56" rx="8" class="d-plain" stroke-width="1.5"/>
+        <text x="232" y="100" class="d-code">confirmed</text>
+        <text x="232" y="119" class="d-text-sm">in a block</text>
+
+        <path d="M291 70 291 30 520 30 520 66" class="d-flow" stroke-width="2" fill="none" marker-end="url(#d1)"/>
+        <text x="300" y="22" class="d-text-sm">replacement evidence from a tail check</text>
+
+        <rect x="446" y="70" width="148" height="56" rx="8" class="d-plain" stroke-width="1.5"/>
+        <text x="462" y="96" class="d-code">reverted</text>
+        <text x="462" y="115" class="d-text-sm">invalidated</text>
+
+        <path d="M520 130 520 168 291 168 291 134" class="d-flow" stroke-width="2" fill="none" marker-end="url(#d1)"/>
+        <text x="300" y="184" class="d-text-sm">the same event returns, keeps its id, gains a new journal entry</text>
+
+        <rect x="612" y="70" width="94" height="56" rx="8" class="d-plain" stroke-width="1.5" stroke-dasharray="5 4"/>
+        <text x="628" y="96" class="d-code">failed</text>
+        <text x="628" y="115" class="d-text-sm">explicit</text>
+      </svg>
+      <figcaption>Confirmed to reverted requires evidence, not silence. An event is never invalidated just because it stopped being visible.</figcaption>
+    </figure>
+
+    <h2 id="reorg">Reorg behaviour</h2>
+    <p>Reorg coverage is recorded as tail replacement only. The indexer rechecks a bounded tail of each source list and emits invalidations only when replacement evidence exists, meaning a list that got shorter or a row that changed. When deployment metadata changes, affected activity is invalidated and rewound before the new decimal scale is applied. An identical event that returns after invalidation keeps its source event id and receives a new journal entry, so a downstream projection can reactivate it rather than duplicate it.</p>
+    <p>On the marketplace side, reorg reconciliation is automatic. The authority appends reorg observations, reopens or invalidates affected orders deterministically, and preserves the funding, broadcast, settlement and replacement lineage.</p>
+    <div class="tablewrap">
+      <table>
+        <caption>Marketplace policy for TAP, as recorded in the protocol registry.</caption>
+        <tbody>
+          <tr><th scope="row">Availability</th><td>Feature gated behind <code>tapMarketplaceV1</code></td></tr>
+          <tr><th scope="row">Execution mode</th><td>In app execution</td></tr>
+          <tr><th scope="row">Listing minimum confirmations</th><td>No numeric policy is enforced</td></tr>
+          <tr><th scope="row">Settlement minimum confirmations</th><td>1</td></tr>
+          <tr><th scope="row">Settlement policy</th><td>Settlement requires the exact confirmed Bitcoin transaction, the consumed TAP transfer inscription, and the buyer indexed balance at stable checkpoints.</td></tr>
+          <tr><th scope="row">Freshness policy</th><td>Every mutation is bound to stable TAP, Ord, Bitcoin Core, and complete-inventory checkpoints; deployment readiness must enforce the configured checkpoint age and lag limits.</td></tr>
+          <tr><th scope="row">Reorg policy</th><td>The authority appends reorg observations, reopens or invalidates affected orders deterministically, and preserves funding, broadcast, settlement, and replacement lineage.</td></tr>
+          <tr><th scope="row">Mutation gate</th><td>Execution requires distinct read and execution credentials, a fresh TAP readiness checkpoint, exact complete inventory, clean funding, immutable economics, and protocol-native post-sign validation.</td></tr>
+          <tr><th scope="row">Unsupported action</th><td><code>sell</code>: TAP has no executable offer workflow on this marketplace surface.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="brc20">How TAP differs from BRC-20</h2>
+    <p>TAP inherits BRC-20's shape: a JSON payload in an inscription, a deploy, a mint and a two step transfer. The differences are concrete rather than philosophical.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th scope="col">Point</th><th scope="col">BRC-20</th><th scope="col">TAP</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Protocol tag</th><td><code>brc-20</code></td><td><code>tap</code></td></tr>
+          <tr><th scope="row">Operation names</th><td><code>deploy</code>, <code>mint</code>, <code>transfer</code></td><td><code>token-deploy</code>, <code>token-mint</code>, <code>token-transfer</code></td></tr>
+          <tr><th scope="row">Ticker size</th><td>Four bytes</td><td>Up to 32 UTF-16 code units and 128 UTF-8 bytes</td></tr>
+          <tr><th scope="row">Ticker character set</th><td>Effectively four ASCII characters</td><td>Any Unicode outside the control, format and separator categories, including emoji</td></tr>
+          <tr><th scope="row">Four character tickers</th><td>The whole namespace</td><td>Not offered by the Bitcoin Universe inscribe surface, which accepts 3 characters or 5 to 32, keeping the two namespaces apart in practice</td></tr>
+          <tr><th scope="row">Extra data on a transfer</th><td>None</td><td>Optional <code>dta</code>, up to 512 UTF-8 bytes, with no protocol meaning</td></tr>
+          <tr class="is-auth"><th scope="row">Delegated authority</th><td>None</td><td>A deployment may name a privilege authority in <code>prv</code>, and privileged operations then require its authorisation</td></tr>
+          <tr class="is-auth"><th scope="row">Batch movement</th><td>One transfer inscription per movement</td><td><code>token-send</code> moves a list of items in one authorised payload</td></tr>
+          <tr><th scope="row">Related asset families</th><td>None on the same tag</td><td>The <code>dmt-</code> family shares the <code>tap</code> tag and is indexed separately</td></tr>
+          <tr><th scope="row">Cursed inscriptions</th><td>Ignored by most indexers</td><td>Placed in a separate ticker namespace with a leading <code>-</code></td></tr>
+          <tr><th scope="row">Transfer model</th><td>Inscribe then send</td><td>Inscribe then send, identical in shape</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="small">The two step transfer is the same in both, which is why a wallet that handles BRC-20 transfer inscriptions safely usually handles TAP ones safely too. The failure mode is also the same: an unsent transfer inscription spent as change loses the parked balance.</p>
+
+    <h2 id="fees">Fees and size</h2>
+    <ul>
+      <li>Every TAP operation is an inscription, so it costs a commit and a reveal transaction plus the witness bytes of the payload. A transfer therefore costs two inscriptions worth of fees over its life: one to create it and one ordinary send to complete it.</li>
+      <li>Payloads are small. A minimal <code>token-transfer</code> is under 60 bytes. The optional <code>dta</code> field is capped at 512 UTF-8 bytes, and a long ticker adds up to 128 bytes.</li>
+      <li>Because witness data is discounted, the dominant cost for a small payload is the fixed transaction overhead rather than the payload itself. Batching many mints into one reveal is the usual way to reduce it.</li>
+      <li>Bitcoin Universe's inscribe flow estimates transaction size as a fixed prefix plus a quarter of the payload byte length, which reflects that witness discount.</li>
+      <li>An output holding a transfer inscription must stay above the dust limit and must be handled by an inscription aware wallet, so it cannot be consolidated the way a plain output can.</li>
+    </ul>
+
+    <h2 id="limits">Limitations</h2>
+    <ul>
+      <li><strong>No mempool coverage.</strong> Bitcoin Universe's TAP source publishes confirmed state only. Pending in the normalised model means "no block evidence", not "seen in the mempool".</li>
+      <li><strong>Reorg detection is bounded.</strong> Only a tail of each source list is rechecked, and invalidations require positive replacement evidence. A reorganisation deeper than that tail is not detected by tail checks alone.</li>
+      <li><strong>Authority operations are not indexed by Bitcoin Universe.</strong> Deployments, mints, transfers and trades are normalised. Authority bearing operations are not, so no Bitcoin Universe surface can show or execute them.</li>
+      <li><strong>DMT is out of scope here.</strong> The <code>dmt-</code> family shares the <code>tap</code> tag but is a separate asset family with its own indexer.</li>
+      <li><strong>No numeric freshness policy is enforced.</strong> The registry records that checkpoint age and lag limits must be enforced by deployment configuration rather than by a value in the registry.</li>
+      <li><strong>Selling is not executable.</strong> Recorded reason: <em>TAP has no executable offer workflow on this marketplace surface.</em></li>
+      <li><strong>This site does not restate upstream rules it cannot check.</strong> Where TAP defines an operation that does not appear in Bitcoin Universe's code, the field shape observed there is given and the upstream Trac documentation is the reference for the rest.</li>
+    </ul>
+
+    <h2 id="security">Security considerations</h2>
+
+    <h3>For holders</h3>
+    <ul>
+      <li>An unsent transfer inscription is a bearer instrument in an ordinary output. Any wallet that can spend that output can destroy the parked balance.</li>
+      <li>Tickers can use the full Unicode range, so visually identical tickers can be different tokens. Compare the normalised ticker, not the rendering.</li>
+      <li>A deployment that names an authority is a standing trust decision that cannot be undone. Read <code>prv</code> before you hold.</li>
+      <li>Pending is not settled. With no mempool feed, treat an unconfirmed TAP transfer as not having happened.</li>
+    </ul>
+
+    <h3>For implementers</h3>
+    <ul>
+      <li>Parse transfer content strictly. A permissive JSON reader will accept duplicate keys, numeric amounts and trailing data, and will then disagree with every strict indexer about who owns what.</li>
+      <li>Never use floating point for amounts. Pad and concatenate strings, and reject anything that does not match the amount grammar exactly.</li>
+      <li>Do not infer a decimal scale. If the deployment is not known yet, hold the row rather than scaling it at zero.</li>
+      <li>Bracket every read with a checkpoint before and after. Two reads at different heights combined into one answer is how a marketplace ends up selling a position that has already moved.</li>
+      <li>Check the whole output, not just the protocol you care about. A TAP position can share an output with runes, rare sats and other protocols' tokens.</li>
+      <li>Require positive evidence to invalidate. An event that stops being visible is not the same as an event that was replaced.</li>
+      <li>Keep read credentials and execution credentials distinct, and fail closed when any dependency cannot supply its evidence.</li>
+    </ul>
+
+    <h3>For marketplace operators</h3>
+    <p>A listing built on a TAP transfer inscription is only as sound as the agreement between the indexer, the ordinals view and Bitcoin Core at one checkpoint. Bitcoin Universe's authority fails closed on a consumed transfer inscription, stale reader state, source or schema disagreement, a tip or reorg race, incomplete inventory, a co-located inscription, runes or special sats on the output, a spent output, and insufficient confirmations. Any of those conditions treated as a warning rather than a refusal is a way to sell something twice.</p>
+
+    <h2 id="checklist">Implementation checklist</h2>
+    <div class="cols">
+      <div class="panel">
+        <h3>Payload layer</h3>
+        <ul>
+          <li>Reject a byte order mark rather than stripping it.</li>
+          <li>Decode UTF-8 strictly, with no replacement characters.</li>
+          <li>Require a single JSON object with string keys and string values only.</li>
+          <li>Reject duplicate keys, unknown keys, trailing commas and trailing data.</li>
+          <li>Compare <code>p</code> and <code>op</code> exactly and case sensitively.</li>
+          <li>Cap <code>dta</code> at 512 UTF-8 bytes.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3>Ticker and amount layer</h3>
+        <ul>
+          <li>Normalise to NFC lower case, and in transfer content require the written form to already match.</li>
+          <li>Enforce 32 UTF-16 code units and 128 UTF-8 bytes.</li>
+          <li>Reject Unicode control, format and separator characters.</li>
+          <li>Apply the leading <code>-</code> namespace for negative inscription numbers.</li>
+          <li>Enforce the amount grammar and the decimal scale, and cap the atomic value at 78 digits.</li>
+          <li>Reject a declared decimal scale outside 0 to 18.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3>State layer</h3>
+        <ul>
+          <li>Track available and transferable balances separately.</li>
+          <li>Ignore a transfer that exceeds the available balance, without partial application.</li>
+          <li>Consume a transfer inscription on its first credited send.</li>
+          <li>Settle a self send back to available.</li>
+          <li>Deduplicate by source row fingerprint so replay is harmless.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3>Operational layer</h3>
+        <ul>
+          <li>Pin protocol, chain, network and source identity, and refuse to open a database built for another.</li>
+          <li>Bracket reads with a checkpoint before and after.</li>
+          <li>Quarantine rather than guess, and rewind when the missing evidence arrives.</li>
+          <li>Emit invalidations only on positive replacement evidence.</li>
+          <li>State your coverage honestly, including the absence of a mempool feed.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="note">
+      <p>Test your implementation against the <a href="vectors.html">test vectors</a>, and check individual payloads with the <a href="validator.html">validator</a>.</p>
+    </div>
+  </main>
+</div>
+
+<footer class="pagefoot">
+  <div class="shell">
+    <div class="footgrid">
+      <dl>
+        <dt>Owning repository</dt><dd><a href="https://github.com/bitcoinuniverseio/tap">bitcoinuniverseio/tap</a></dd>
+        <dt>Source path</dt><dd><code>reference.html</code></dd>
+        <dt>Document version</dt><dd>2.0.0</dd>
+      </dl>
+      <dl>
+        <dt>Lifecycle</dt><dd>Experimental</dd>
+        <dt>Chain and network</dt><dd>Bitcoin mainnet</dd>
+        <dt>Last verified</dt><dd><time datetime="2026-09-01">1 September 2026</time></dd>
+      </dl>
+      <dl>
+        <dt>Edit this page</dt><dd><a href="https://github.com/bitcoinuniverseio/tap/edit/main/reference.html">on GitHub</a></dd>
+        <dt>Portal</dt><dd><a href="https://docs.bitcoinuniverse.io/">docs.bitcoinuniverse.io</a></dd>
+        <dt>Report a flaw</dt><dd><a href="https://github.com/bitcoinuniverseio/tap/security/advisories/new">Private advisory</a></dd>
+      </dl>
+    </div>
+    <p class="footnote">TAP originates in the Trac ecosystem. This documentation describes the Bitcoin mainnet profile that Bitcoin Universe indexes, and marks Bitcoin Universe specific decisions where they occur.</p>
+  </div>
+</footer>
+
+<script src="site.js" defer></script>
+</body>
+</html>

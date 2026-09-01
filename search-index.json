@@ -1,0 +1,323 @@
+{
+  "site": "TAP protocol documentation",
+  "base": "https://bitcoinuniverseio.github.io/tap/",
+  "documentVersion": "2.0.0",
+  "generated": "2026-09-01",
+  "records": [
+    {
+      "page": "Overview",
+      "title": "What TAP is",
+      "url": "index.html#what",
+      "aliases": ["tap", "tap protocol", "trac", "trac systems", "inscribed token", "ordinals token", "what is tap"],
+      "text": "TAP is an inscribed token protocol from the Trac ecosystem. Every action is a small JSON object inscribed on a satoshi and tagged with p equal to tap. There is no contract and no sidechain. TAP is an upstream protocol that Bitcoin Universe indexes, not a Bitcoin Universe invention."
+    },
+    {
+      "page": "Overview",
+      "title": "Authority in one picture",
+      "url": "index.html#authority",
+      "aliases": ["authority", "authorisation", "authorization", "privileged", "delegated authority", "gold", "prv"],
+      "text": "Most TAP operations are ordinary: anybody holding a balance can transfer it. A smaller set is authority bearing and only counts when the authority named by the deployment has signed for it. Ordinary operations are drawn in indigo and authority bearing operations in gold."
+    },
+    {
+      "page": "Overview",
+      "title": "Protocol facts",
+      "url": "index.html#facts",
+      "aliases": ["chain", "network", "mainnet", "bitcoin", "protocol tag", "carrier", "ownership model", "hybrid", "coverage"],
+      "text": "Chain bitcoin, network mainnet, protocol tag tap, carried by Ordinal inscriptions, hybrid ownership model, payment and ordinals address roles, ticker up to 32 UTF-16 code units and 128 UTF-8 bytes, decimal scale 0 to 18, partial source coverage, marketplace feature gated behind tapMarketplaceV1."
+    },
+    {
+      "page": "Overview",
+      "title": "Operations at a glance",
+      "url": "index.html#operations",
+      "aliases": ["operations", "ops", "op", "token-deploy", "token-mint", "token-transfer", "token-send", "dmt-deploy", "dmt-mint"],
+      "text": "token-deploy creates a ticker, token-mint mints under its terms, token-transfer is step one of a transfer, token-send moves a list of items in one authorised payload, and the dmt family carries Digital Matter Theory assets on the tap tag."
+    },
+    {
+      "page": "Overview",
+      "title": "Support in Bitcoin Universe",
+      "url": "index.html#universe",
+      "aliases": ["support", "wallet", "inscribe", "core", "marketplace", "sell", "capability", "registry"],
+      "text": "Core supports discovery, listing, repricing, unlisting, buying, offers, settlement and reconciliation. Wallet supports view, send and receive. Inscribe supports deploy, mint and transfer. The sell action is unsupported with the recorded reason that TAP has no executable offer workflow on this marketplace surface."
+    },
+    {
+      "page": "Overview",
+      "title": "Related protocols",
+      "url": "index.html#related",
+      "aliases": ["tap on doge", "tap-on-doge", "dogecoin", "doge", "related", "docs platform"],
+      "text": "TAP on Doge is the Dogecoin variant of TAP, documented in its own repository, with its own indexing and marketplace behaviour. The central portal is docs.bitcoinuniverse.io. Upstream TAP documentation lives at docs.tap-protocol.com."
+    },
+    {
+      "page": "Specification",
+      "title": "Scope and conformance",
+      "url": "spec.html#scope",
+      "aliases": ["scope", "conformance", "normative", "rules", "sc-1", "profile"],
+      "text": "This document specifies the TAP profile that Bitcoin Universe indexes. An implementation conforms when it accepts every payload marked valid and rejects every payload marked invalid. A payload that fails any rule is not an operation: nothing moves and the chain records no error."
+    },
+    {
+      "page": "Specification",
+      "title": "Carrier and transaction anatomy",
+      "url": "spec.html#carrier",
+      "aliases": ["carrier", "inscription", "ordinal", "taproot", "inscription id", "txid", "cursed", "anatomy", "content type"],
+      "text": "A TAP operation is the body of an Ordinal inscription, written by Bitcoin Universe as text plain charset utf-8 in a taproot script path reveal. An inscription is identified by txid i index. A negative inscription number is a cursed inscription and its ticker sits in a separate namespace."
+    },
+    {
+      "page": "Specification",
+      "title": "Payload encoding",
+      "url": "spec.html#encoding",
+      "aliases": ["encoding", "json", "bom", "byte order mark", "utf-8", "duplicate key", "trailing comma", "dta", "en-1", "strict parser"],
+      "text": "Content must be non empty, carry no byte order mark, decode as strict UTF-8, and be exactly one JSON object with string keys and string values. Permitted keys are p, op, tick, amt and dta. No duplicate keys, no unknown keys, no trailing comma, no data after the closing brace. p must equal tap and op must equal token-transfer exactly. dta is capped at 512 UTF-8 bytes."
+    },
+    {
+      "page": "Specification",
+      "title": "Tickers",
+      "url": "spec.html#tickers",
+      "aliases": ["ticker", "tick", "nfc", "normalisation", "normalization", "emoji", "utf-16", "code units", "four character", "tk-2"],
+      "text": "A ticker is compared after NFC normalisation and lower casing. It must be at most 32 UTF-16 code units and 128 UTF-8 bytes, with no Unicode control, format or separator characters. Astral characters such as emoji count as two code units each. Negative inscription numbers get a leading hyphen namespace. The Bitcoin Universe inscribe surface accepts 3 characters or 5 to 32 characters."
+    },
+    {
+      "page": "Specification",
+      "title": "Decimals and amounts",
+      "url": "spec.html#amounts",
+      "aliases": ["amount", "amt", "decimals", "dec", "atomic", "precision", "grammar", "am-4", "leading zero", "78 digits"],
+      "text": "A declared decimal scale is an integer from 0 to 18, defaulting to 0. An amount is an exact JSON string with no sign, exponent, separator or leading zero. Fractional digits must not exceed the scale. Conversion pads and concatenates strings, never floating point. The atomic value is capped at 78 digits and balances can never be negative."
+    },
+    {
+      "page": "Specification",
+      "title": "Operations and per operation fields",
+      "url": "spec.html#operations",
+      "aliases": ["operation table", "fields", "required fields", "max", "lim", "prv", "items", "elem", "dt", "prj", "op-1"],
+      "text": "token-deploy takes tick, max and lim with optional prv and dec. token-mint takes tick and amt with optional prv and dta. token-transfer takes tick and amt with optional dta. token-send takes items, each with tick, amt and address. dmt-deploy takes tick, elem, prv and dt with optional id and prj. An unrecognised op is ignored."
+    },
+    {
+      "page": "Specification",
+      "title": "Authority model",
+      "url": "spec.html#authority",
+      "aliases": ["authority", "privilege authority", "prv", "salt", "signature", "delegation", "au-1", "pa token", "privileged operations"],
+      "text": "A ticker has an authority only if its deployment named one in prv, and there is no way to add one later. The authority is identified by an inscription holding the public key against which authorised bodies are checked. An authorised body is produced by the authority and carries a salt so it cannot be replayed. Ordinary transfers never consult the authority and cannot be blocked or reversed by it."
+    },
+    {
+      "page": "Specification",
+      "title": "State model and transitions",
+      "url": "spec.html#state",
+      "aliases": ["state", "transitions", "available balance", "transferable", "consumed", "self send", "st-3", "balance"],
+      "text": "Inscribing a token-transfer moves the amount from available to a transferable balance bound to that inscription. Sending the inscription credits the recipient and consumes it. A transfer for more than the available balance has no effect. Sending a live transfer inscription back to its creator settles it at that address."
+    },
+    {
+      "page": "Specification",
+      "title": "Invalidity conditions",
+      "url": "spec.html#invalid",
+      "aliases": ["invalid", "rejected", "reject", "errors", "failure", "conditions"],
+      "text": "A payload is not an operation when it carries a byte order mark, is not valid UTF-8, is not a single non empty JSON object, has a non string value, repeats a key, carries an unknown key, misses a required key, carries a control character, has a trailing comma or trailing data, fails the ticker rules, fails the amount grammar, or is authority bearing without a valid authorisation."
+    },
+    {
+      "page": "Specification",
+      "title": "Bitcoin Universe indexing decisions",
+      "url": "spec.html#universe",
+      "aliases": ["indexing decisions", "quarantine", "partial coverage", "rewind", "identity pinning", "256 kib", "un-1"],
+      "text": "Source coverage is partial because the writer provides confirmed indexed state and authenticated block digests but no pending mempool feed. Activity for an unknown ticker is quarantined rather than scaled with a guessed decimal scale. Raw records are capped at 256 KiB. The service pins source identity and stores an identity hash in its database."
+    },
+    {
+      "page": "Guide",
+      "title": "The two step transfer",
+      "url": "guide.html#flow",
+      "aliases": ["two step", "inscribe then send", "transfer", "how to transfer", "step one", "step two", "transferable balance"],
+      "text": "A TAP transfer is two actions. Inscribing a transfer moves the amount out of your available balance into an inscription you own. Sending that inscription is the moment the balance arrives and the inscription is used up. Between the two steps the inscription is an ordinary ordinal that a careless wallet can spend."
+    },
+    {
+      "page": "Guide",
+      "title": "Worked example: deploying a ticker",
+      "url": "guide.html#deploy",
+      "aliases": ["deploy", "token-deploy", "max supply", "lim", "mint limit", "launch a token"],
+      "text": "A deployment fixes the ticker, the supply cap in max and the per mint limit in lim. Nothing about it can be changed afterwards. Naming a privilege authority inscription in prv is the decision that gives the ticker an authority, permanently."
+    },
+    {
+      "page": "Guide",
+      "title": "Worked example: minting",
+      "url": "guide.html#mint",
+      "aliases": ["mint", "token-mint", "minting", "claim"],
+      "text": "A mint claims an amount into the address that receives the inscription, within the deployment's per mint limit and remaining supply. A mint above the limit does not clamp, it simply does nothing."
+    },
+    {
+      "page": "Guide",
+      "title": "Worked example: transferring",
+      "url": "guide.html#transfer",
+      "aliases": ["transfer", "token-transfer", "send tokens", "dta", "cancel a transfer"],
+      "text": "Step one inscribes the transfer payload. Every character matters: an extra field, a repeated field or a numeric amount means it is not a transfer at all. Step two sends the inscription to the destination. Sending it back to yourself settles the transfer at your own address and returns the amount to available."
+    },
+    {
+      "page": "Guide",
+      "title": "When a token has an authority",
+      "url": "guide.html#authority",
+      "aliases": ["authority", "prv", "gated mint", "allowlist", "trust"],
+      "text": "Your ordinary transfer path is untouched by an authority. Minting may be gated, because when a deployment has an authority the mint body can be produced by that authority. An authorised batch send exists at protocol level. Check whether a ticker's deployment carries prv before holding it, because an authority cannot be removed later."
+    },
+    {
+      "page": "Guide",
+      "title": "Mistakes that cost money",
+      "url": "guide.html#mistakes",
+      "aliases": ["mistakes", "lost tokens", "spent inscription", "accidental spend", "risk", "safety"],
+      "text": "Spending a transfer inscription as change destroys the parked amount. Trusting an unconfirmed transfer is unsafe because there is no mempool feed. Two tickers that look identical on screen can be different tokens. A consumed transfer inscription cannot be reused."
+    },
+    {
+      "page": "Guide",
+      "title": "What Bitcoin Universe supports",
+      "url": "guide.html#support",
+      "aliases": ["support matrix", "wallet support", "marketplace support", "feature gate", "tapmarketplacev1"],
+      "text": "A matrix of what the Bitcoin Universe product code implements across Core, Wallet and Inscribe. It records implementation, not production enablement. Authority bearing operations are not supported on any surface, and the sell action is not supported on Core."
+    },
+    {
+      "page": "Guide",
+      "title": "Buying and selling",
+      "url": "guide.html#market",
+      "aliases": ["marketplace", "listing", "buy", "sell", "psbt", "settlement", "inventory", "co-located"],
+      "text": "The marketplace treats a TAP position as one live transfer inscription. Before a listing exists the authority must agree with the indexer, the ordinals view and Bitcoin Core at the same checkpoint, and prove the output holds exactly that inscription with no runes and no special sats. Settlement needs one Bitcoin confirmation and the consumed transfer inscription."
+    },
+    {
+      "page": "Reference",
+      "title": "Terminology",
+      "url": "reference.html#terms",
+      "aliases": ["terminology", "glossary", "definitions", "available balance", "transferable balance", "quarantine", "checkpoint", "dmt"],
+      "text": "Available balance, transferable balance, transfer inscription, consumed, privilege authority, authority bearing, atomic amount, cursed inscription, quarantine, checkpoint and DMT defined in one table."
+    },
+    {
+      "page": "Reference",
+      "title": "Indexer semantics",
+      "url": "reference.html#indexer",
+      "aliases": ["indexer", "index-tap", "identity pinning", "replay", "offsets", "holder snapshot", "addresses", "bech32"],
+      "text": "The service pins protocol, chain, network, writer identity, version and revision, and stores an identity hash so a database built for another source cannot be opened. Reads are bracketed by authenticated block digest checks. Source rows are deduplicated by fingerprint. Addresses are Bitcoin mainnet only and mixed case Bech32 is rejected."
+    },
+    {
+      "page": "Reference",
+      "title": "Confirmation states",
+      "url": "reference.html#confirmation",
+      "aliases": ["confirmation", "confirmed", "pending", "reverted", "failed", "mempool", "coverage", "block height"],
+      "text": "A row with a block height is confirmed. A row without block evidence is pending. Statuses of reverted, invalid, orphaned or reorged map to reverted, and failed, rejected or error map to failed. Pending does not mean seen in the mempool: source coverage is partial and there is no pending mempool feed."
+    },
+    {
+      "page": "Reference",
+      "title": "Reorg behaviour",
+      "url": "reference.html#reorg",
+      "aliases": ["reorg", "reorganisation", "reorganization", "invalidation", "tail check", "replacement", "rollback", "settlement confirmations"],
+      "text": "Reorg coverage is tail replacement only. A bounded tail of each source list is rechecked and invalidations are emitted only when replacement evidence exists. Marketplace reorg reconciliation is automatic: the authority appends observations and reopens or invalidates affected orders deterministically while preserving lineage. Settlement requires one confirmation."
+    },
+    {
+      "page": "Reference",
+      "title": "How TAP differs from BRC-20",
+      "url": "reference.html#brc20",
+      "aliases": ["brc-20", "brc20", "difference", "comparison", "versus", "four byte ticker", "namespace"],
+      "text": "TAP uses the tap protocol tag and the token- prefixed operation names, allows tickers up to 32 UTF-16 code units instead of four bytes, adds an optional dta field on transfers, adds delegated authority through prv, adds a batch token-send, shares its tag with the dmt family and gives cursed inscriptions their own ticker namespace. The two step transfer is identical in both."
+    },
+    {
+      "page": "Reference",
+      "title": "Fees and size",
+      "url": "reference.html#fees",
+      "aliases": ["fees", "fee", "size", "witness discount", "dust", "cost", "batching"],
+      "text": "Every TAP operation is an inscription, so a transfer costs a commit and reveal plus one ordinary send. A minimal transfer payload is under 60 bytes, dta adds up to 512 and a long ticker up to 128. Witness data is discounted, so fixed transaction overhead dominates and batching mints into one reveal is the usual saving."
+    },
+    {
+      "page": "Reference",
+      "title": "Limitations",
+      "url": "reference.html#limits",
+      "aliases": ["limitations", "limits", "gaps", "not supported", "no mempool", "freshness"],
+      "text": "No mempool coverage, bounded reorg detection, no indexing of authority bearing operations by Bitcoin Universe, DMT handled by a separate indexer, no numeric freshness policy in the registry, and the sell action not executable. This site does not restate upstream rules it cannot check."
+    },
+    {
+      "page": "Reference",
+      "title": "Security considerations",
+      "url": "reference.html#security",
+      "aliases": ["security", "threats", "risks", "bearer instrument", "lookalike ticker", "double sell", "fail closed"],
+      "text": "For holders: an unsent transfer inscription is a bearer instrument in an ordinary output, tickers can be visually identical but different, an authority is a permanent trust decision, and pending is not settled. For implementers: parse strictly, never use floating point, never infer a decimal scale, bracket reads with checkpoints, check the whole output and require positive evidence to invalidate."
+    },
+    {
+      "page": "Reference",
+      "title": "Implementation checklist",
+      "url": "reference.html#checklist",
+      "aliases": ["checklist", "implementation", "how to implement", "indexer checklist", "conformance"],
+      "text": "Payload layer, ticker and amount layer, state layer and operational layer checklists for anyone implementing TAP, covering strict parsing, normalisation, atomic conversion, available and transferable balances, identity pinning, checkpoint bracketing and honest coverage reporting."
+    },
+    {
+      "page": "Test vectors",
+      "title": "Accepted vectors",
+      "url": "vectors.html#accepted",
+      "aliases": ["accepted", "valid", "vectors", "passing", "examples", "emoji ticker", "cursed"],
+      "text": "Whitespace with a mixed case ticker and optional data, a negative inscription number producing a hyphen prefixed ticker, a ticker of sixteen emoji at exactly 32 UTF-16 code units, and optional data at exactly 512 UTF-8 bytes."
+    },
+    {
+      "page": "Test vectors",
+      "title": "Amount conversions",
+      "url": "vectors.html#amounts",
+      "aliases": ["amount conversion", "atomic", "scale", "1.25", "padding"],
+      "text": "1.25 at scale 4 becomes 12500. 1 at scale 8 becomes 100000000. 0 at scale 8 and at scale 0 both become 0."
+    },
+    {
+      "page": "Test vectors",
+      "title": "Rejected: payload shape",
+      "url": "vectors.html#rejected-shape",
+      "aliases": ["rejected", "invalid", "duplicate field", "unknown field", "nested value", "numeric amount", "trailing comma", "trailing data"],
+      "text": "Duplicate p, an extra unknown field, a nested object as a value, a numeric amount, a trailing comma and data after the closing brace are all rejections, each with the rule that decides it."
+    },
+    {
+      "page": "Test vectors",
+      "title": "Rejected: encoding",
+      "url": "vectors.html#rejected-encoding",
+      "aliases": ["bom", "byte order mark", "invalid utf-8", "ff fe", "encoding rejection"],
+      "text": "A leading byte order mark is a rejection rather than something to strip. Bytes that are not valid UTF-8 are rejected without substituting replacement characters."
+    },
+    {
+      "page": "Test vectors",
+      "title": "Rejected: ticker and amount",
+      "url": "vectors.html#rejected-ticker",
+      "aliases": ["ticker too long", "40 code units", "leading zero", "precision", "79 digits", "dta too long"],
+      "text": "A ticker of twenty emoji is 40 UTF-16 code units and fails the limit of 32. An amount of 01 fails the leading zero rule, 1.001 at scale 2 exceeds the scale, a numeric amount fails the exact string rule, and a 79 digit atomic value exceeds the range. Optional data of 513 bytes exceeds the 512 byte cap."
+    },
+    {
+      "page": "Test vectors",
+      "title": "Rejected: deployment and holder records",
+      "url": "vectors.html#rejected-deploy",
+      "aliases": ["decimals 19", "negative balance", "mixed case bech32", "address rejection"],
+      "text": "A declared decimal scale of 19 rejects the deployment. A negative holder balance is refused rather than clamped. A mixed case Bech32 address is rejected outright."
+    },
+    {
+      "page": "Test vectors",
+      "title": "Rule coverage",
+      "url": "vectors.html#coverage",
+      "aliases": ["coverage", "which rules", "untested", "chain state"],
+      "text": "A table mapping vectors to the rules they exercise, and naming the rules that need chain state instead of a payload. No authority vectors are published because Bitcoin Universe's TAP indexer does not index authority bearing operations."
+    },
+    {
+      "page": "Validator",
+      "title": "TAP payload validator",
+      "url": "validator.html#tool",
+      "aliases": ["validator", "decoder", "check payload", "tool", "parse", "lint", "test my payload"],
+      "text": "Paste a TAP inscription payload. The tool identifies the operation, checks the fields it requires, explains the authority requirement when the operation is authority bearing, and names the rule behind any rejection. It runs entirely in your browser."
+    },
+    {
+      "page": "Validator",
+      "title": "What it checks, and what it cannot",
+      "url": "validator.html#scope",
+      "aliases": ["validator scope", "limits of the tool", "cannot check", "chain state"],
+      "text": "It checks the byte level transfer contract, the protocol tag and operation, the field set per operation, ticker limits and form, the amount grammar and atomic conversion, the dta cap and the authority requirement. It cannot check whether the ticker exists, whether the sender has the balance, whether a signature is valid or whether the inscription has been consumed."
+    },
+    {
+      "page": "Validator",
+      "title": "Privacy",
+      "url": "validator.html#privacy",
+      "aliases": ["privacy", "tracking", "logging", "local storage", "no network"],
+      "text": "The whole check runs in the page. There is no network request when you press the button, nothing is written to storage and nothing is logged. The only value this site stores is your light or dark theme preference."
+    },
+    {
+      "page": "Changelog",
+      "title": "Document version history",
+      "url": "changelog.html#v2",
+      "aliases": ["changelog", "history", "versions", "2.0.0", "1.0.0", "what changed"],
+      "text": "Version 2.0.0 rebuilt this site from a short introduction into a complete protocol dossier with a normative specification, test vectors, a validator, search and corrected repository links. Version 1.0.0 was the initial public introduction."
+    },
+    {
+      "page": "Changelog",
+      "title": "Known gaps",
+      "url": "changelog.html#open",
+      "aliases": ["gaps", "open", "todo", "missing", "upstream", "not specified"],
+      "text": "The authorisation format for token-send and the authority inscription format are not specified here at field level because they do not appear in Bitcoin Universe's code in a verifiable form. There are no authority vectors for the same reason. Support claims cover Bitcoin Universe surfaces only."
+    }
+  ]
+}
