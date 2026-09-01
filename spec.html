@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TAP specification: payload contract, tickers, amounts, authority</title>
+<meta name="description" content="Numbered normative rules for TAP on Bitcoin mainnet: inscription carrier and encoding, ticker rules, decimals and amounts, the operation table with per operation fields, the authority model, state transitions and every invalidity condition.">
+<link rel="canonical" href="https://bitcoinuniverseio.github.io/tap/spec.html">
+<meta name="theme-color" content="#0b0e26" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f5fb" media="(prefers-color-scheme: light)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TAP specification: payload contract, tickers, amounts, authority">
+<meta property="og:description" content="Numbered normative rules for TAP on Bitcoin mainnet, grounded in Bitcoin Universe's indexer code.">
+<meta property="og:url" content="https://bitcoinuniverseio.github.io/tap/spec.html">
+<meta property="og:image" content="https://bitcoinuniverseio.github.io/tap/og.svg">
+<meta property="og:site_name" content="TAP protocol documentation">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="masthead">
+  <div class="shell masthead-in">
+    <a class="seal" href="index.html">
+      <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true" focusable="false">
+        <path d="M17 2.4 29.6 9.2v15.6L17 31.6 4.4 24.8V9.2Z" fill="var(--indigo-soft)" stroke="var(--indigo)" stroke-width="1.6" stroke-linejoin="round"/>
+        <path d="M10.8 17.4 15.2 22 23.2 12.6" fill="none" stroke="var(--gold-line)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>TAP<small>Protocol documentation</small></span>
+    </a>
+    <nav class="mainnav" aria-label="Documentation sections">
+      <ul>
+        <li><a href="index.html">Overview</a></li>
+        <li><a href="spec.html" aria-current="page">Specification</a></li>
+        <li><a href="guide.html">Guide</a></li>
+        <li><a href="reference.html">Reference</a></li>
+        <li><a href="vectors.html">Test vectors</a></li>
+        <li><a href="validator.html">Validator</a></li>
+        <li><a href="changelog.html">Changelog</a></li>
+      </ul>
+    </nav>
+    <div class="tools">
+      <form class="searchbox" role="search" hidden>
+        <label class="vh" for="site-search">Search this documentation</label>
+        <input id="site-search" type="search" placeholder="Search, or press /" autocomplete="off" data-base="" hidden>
+        <ul class="hitlist" id="site-search-results"></ul>
+      </form>
+      <button class="themebtn" id="theme-toggle" type="button" hidden aria-pressed="false">Dark</button>
+    </div>
+  </div>
+</header>
+
+<div class="shell frame">
+  <nav class="sidenav" aria-label="On this page">
+    <p>On this page</p>
+    <ul>
+      <li><a href="#scope">1. Scope</a></li>
+      <li><a href="#carrier">2. Carrier and anatomy</a></li>
+      <li><a href="#encoding">3. Payload encoding</a></li>
+      <li><a href="#tickers">4. Tickers</a></li>
+      <li><a href="#amounts">5. Decimals and amounts</a></li>
+      <li><a href="#operations">6. Operations</a></li>
+      <li><a href="#authority">7. Authority model</a></li>
+      <li><a href="#state">8. State and transitions</a></li>
+      <li><a href="#invalid">9. Invalidity conditions</a></li>
+      <li><a href="#universe">10. Indexing decisions</a></li>
+    </ul>
+  </nav>
+
+  <main class="doc" id="main">
+    <p class="kicker">Normative specification, document version 2.0.0</p>
+    <h1>TAP specification for Bitcoin mainnet</h1>
+    <p class="lede">Every numbered rule below is enforced by code that Bitcoin Universe runs, or is recorded in the payload builders and protocol registry that Bitcoin Universe maintains. Where TAP defines behaviour that Bitcoin Universe does not implement, this document says so rather than restating rules it cannot check.</p>
+
+    <h2 id="scope">1. Scope and conformance</h2>
+    <ul class="rules">
+      <li><span class="rid">SC-1</span>This document specifies the TAP profile that Bitcoin Universe indexes: protocol tag <code>tap</code>, chain Bitcoin, network mainnet, carried by Ordinal inscriptions.</li>
+      <li><span class="rid">SC-2</span>An implementation conforms when it accepts every payload this document marks as valid and rejects every payload it marks as invalid, at the same point in the pipeline.</li>
+      <li><span class="rid">SC-3</span>TAP is defined upstream in the Trac ecosystem. Rules here that carry the label <span class="tag tag-out">Universe</span> are decisions taken by Bitcoin Universe's indexer, not properties of TAP itself.</li>
+      <li><span class="rid">SC-4</span>The rules in section 3 are stated at byte level because Bitcoin Universe's marketplace authority must prove, from inscription content alone, that a given inscription is a TAP <code>token-transfer</code>. Other operations are specified at field level.</li>
+      <li><span class="rid">SC-5</span>A payload that fails any rule is not an operation. Nothing moves, and the chain records no error. There is no partial application and no repair.</li>
+    </ul>
+
+    <h2 id="carrier">2. Carrier and transaction anatomy</h2>
+    <ul class="rules">
+      <li><span class="rid">CA-1</span>A TAP operation is the body of an Ordinal inscription. The inscription's envelope, ordering and numbering follow the Ordinals conventions, which this document does not restate.</li>
+      <li><span class="rid">CA-2</span>Bitcoin Universe's inscribe flow writes TAP payloads with the content type <code>text/plain;charset=utf-8</code>, committed in a taproot script path reveal.</li>
+      <li><span class="rid">CA-3</span>An inscription is identified by <code>&lt;txid&gt;i&lt;index&gt;</code> where the txid is 64 lower case hexadecimal characters and the index is a decimal integer with no leading zero.</li>
+      <li><span class="rid">CA-4</span>The address that controls the output holding an inscription is the address that holds it. A TAP balance follows the address, and a pending transfer follows the specific inscription and its output.</li>
+      <li><span class="rid">CA-5</span><span class="tag tag-out">Universe</span> Addresses are Bitcoin mainnet only. A mixed case Bech32 string is rejected outright. Addresses supplied by users are never rewritten between networks.</li>
+      <li><span class="rid">CA-6</span>An inscription whose inscription number is negative is a cursed inscription. Its ticker is placed in a separate namespace, described in rule TK-6.</li>
+    </ul>
+
+    <h2 id="encoding">3. Payload encoding</h2>
+    <p>These rules define the exact content contract for a TAP <code>token-transfer</code>. They are a direct statement of the parser used by Bitcoin Universe's TAP indexer.</p>
+    <ul class="rules">
+      <li><span class="rid">EN-1</span>The content must be at least one byte and no more than the configured maximum content size.</li>
+      <li><span class="rid">EN-2</span>The content must not begin with a UTF-8 byte order mark. A leading <code>EF BB BF</code> is a rejection, not something to strip.</li>
+      <li><span class="rid">EN-3</span>The content must decode as UTF-8 with no replacement. Any invalid sequence is a rejection.</li>
+      <li><span class="rid">EN-4</span>The content must be exactly one JSON object. Whitespace, meaning space, tab, carriage return and line feed, is permitted before it, after it and between its tokens.</li>
+      <li><span class="rid">EN-5</span>The object must not be empty.</li>
+      <li><span class="rid">EN-6</span>Every key and every value must be a JSON string. Numbers, booleans, nulls, arrays and nested objects are all rejections.</li>
+      <li><span class="rid">EN-7</span>No key may appear more than once.</li>
+      <li><span class="rid">EN-8</span>The permitted key set is exactly <code>p</code>, <code>op</code>, <code>tick</code>, <code>amt</code> and <code>dta</code>. Any other key is a rejection, including keys that other TAP operations use.</li>
+      <li><span class="rid">EN-9</span>The keys <code>p</code>, <code>op</code>, <code>tick</code> and <code>amt</code> are required.</li>
+      <li><span class="rid">EN-10</span>A JSON string must not contain an unescaped character below <code>U+0020</code>.</li>
+      <li><span class="rid">EN-11</span>A trailing comma before the closing brace is a rejection.</li>
+      <li><span class="rid">EN-12</span>Any data after the closing brace, other than the whitespace of rule EN-4, is a rejection.</li>
+      <li><span class="rid">EN-13</span><code>p</code> must equal <code>tap</code> exactly. <code>op</code> must equal <code>token-transfer</code> exactly. Both comparisons are case sensitive and are made before any normalisation.</li>
+      <li><span class="rid">EN-14</span><code>dta</code> is optional free data. When present it must be at most 512 UTF-8 bytes. It carries no protocol meaning.</li>
+    </ul>
+    <div class="note">
+      <p>The parser reads the object itself rather than handing the text to a general JSON reader. That is deliberate: two payloads that a permissive reader would treat as equal, for instance one with a duplicate key, must not be able to produce the same transfer.</p>
+    </div>
+
+    <h2 id="tickers">4. Tickers</h2>
+    <ul class="rules">
+      <li><span class="rid">TK-1</span>A ticker is compared after Unicode NFC normalisation and lower casing. <code>TÄP</code>, <code>täp</code> and the decomposed spelling of either are the same ticker.</li>
+      <li><span class="rid">TK-2</span>A ticker must be at least one and at most 32 UTF-16 code units. Characters outside the Basic Multilingual Plane, including most emoji, count as two code units each, so a ticker of emoji is limited to 16 of them.</li>
+      <li><span class="rid">TK-3</span>A ticker must be at most 128 UTF-8 bytes.</li>
+      <li><span class="rid">TK-4</span>In <code>token-transfer</code> content, the ticker as written must already equal its NFC lower case form. A ticker that only becomes valid after normalisation is a rejection.</li>
+      <li><span class="rid">TK-5</span>A ticker must contain no character in the Unicode categories <code>\p{C}</code> (control, format, surrogate, private use, unassigned) or <code>\p{Z}</code> (space and other separators).</li>
+      <li><span class="rid">TK-6</span>When the inscription number is negative and the normalised ticker does not already begin with <code>-</code>, the indexed ticker becomes that ticker with a single leading <code>-</code>. Cursed inscriptions therefore cannot collide with the tickers of ordinary inscriptions.</li>
+      <li><span class="rid">TK-7</span><span class="tag tag-out">Universe</span> The Bitcoin Universe inscribe surface accepts a ticker of exactly 3 characters, or of 5 to 32 characters, when deploying. Four character tickers are not offered there. This is a product rule, not an indexing rule: a four character TAP ticker deployed elsewhere still indexes.</li>
+    </ul>
+
+    <h2 id="amounts">5. Decimals and amounts</h2>
+    <ul class="rules">
+      <li><span class="rid">AM-1</span>A deployment may declare a decimal scale. The accepted range is an integer from 0 to 18. An absent or empty value means 0.</li>
+      <li><span class="rid">AM-2</span>A declared scale outside 0 to 18, or one that is not an integer, is a rejection of the deployment.</li>
+      <li><span class="rid">AM-3</span>An amount must be a JSON string with no surrounding whitespace. A JSON number is a rejection, even when it would round trip.</li>
+      <li><span class="rid">AM-4</span>An amount must match <code>^(0|[1-9]\d*)(?:\.(\d+))?$</code>. No sign, no exponent, no thousands separator, no leading zero on the integer part, no bare decimal point.</li>
+      <li><span class="rid">AM-5</span>The fractional part must be no longer than the deployment's decimal scale.</li>
+      <li><span class="rid">AM-6</span>The atomic value is formed by right padding the fractional part to the decimal scale, concatenating it to the integer part and stripping leading zeros. The conversion is a string operation. Floating point arithmetic is never used.</li>
+      <li><span class="rid">AM-7</span>The atomic value must be at most 78 decimal digits.</li>
+      <li><span class="rid">AM-8</span>A balance may never be negative. A holder record that reports a negative balance is a rejection of that record.</li>
+    </ul>
+    <div class="tablewrap">
+      <table>
+        <caption>Worked conversions, taken from the indexer's own test suite.</caption>
+        <thead><tr><th scope="col">Amount as written</th><th scope="col">Decimal scale</th><th scope="col">Atomic value</th></tr></thead>
+        <tbody>
+          <tr><td><code>1.25</code></td><td>4</td><td><code>12500</code></td></tr>
+          <tr><td><code>1</code></td><td>8</td><td><code>100000000</code></td></tr>
+          <tr><td><code>0</code></td><td>8</td><td><code>0</code></td></tr>
+          <tr><td><code>0</code></td><td>0</td><td><code>0</code></td></tr>
+          <tr><td><code>01</code></td><td>0</td><td>rejected by rule AM-4</td></tr>
+          <tr><td><code>1.001</code></td><td>2</td><td>rejected by rule AM-5</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="operations">6. Operations</h2>
+    <ul class="rules">
+      <li><span class="rid">OP-1</span>Every TAP payload carries <code>p</code> equal to <code>tap</code> and an <code>op</code> naming the operation.</li>
+      <li><span class="rid">OP-2</span>An unrecognised <code>op</code> is ignored. It does not invalidate the token and it does not consume anything.</li>
+      <li><span class="rid">OP-3</span>An operation is authority bearing when it can only take effect with a signature from the privilege authority that the ticker's deployment named. Ordinary operations stand on their own content.</li>
+      <li><span class="rid">OP-4</span>The <code>dmt-</code> family is carried on the <code>tap</code> protocol tag but describes Digital Matter Theory assets. It is a distinct asset family with its own indexing.</li>
+    </ul>
+
+    <div class="tablewrap">
+      <table>
+        <caption>Per operation field requirements. Rows shaded gold are authority bearing. Required fields are listed first, optional fields in brackets.</caption>
+        <thead>
+          <tr>
+            <th scope="col">Operation</th>
+            <th scope="col">Fields</th>
+            <th scope="col">Authority</th>
+            <th scope="col">Indexed by Bitcoin Universe</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>token-deploy</code></td>
+            <td><code>p</code>, <code>op</code>, <code>tick</code>, <code>max</code>, <code>lim</code> [<code>prv</code>, <code>dec</code>]</td>
+            <td>Optional, through <code>prv</code></td>
+            <td>Yes, as a deployment</td>
+          </tr>
+          <tr>
+            <td><code>token-mint</code></td>
+            <td><code>p</code>, <code>op</code>, <code>tick</code>, <code>amt</code> [<code>prv</code>, <code>dta</code>]</td>
+            <td>Optional, set by the deployment</td>
+            <td>Yes, as a mint</td>
+          </tr>
+          <tr>
+            <td><code>token-transfer</code></td>
+            <td><code>p</code>, <code>op</code>, <code>tick</code>, <code>amt</code> [<code>dta</code>]</td>
+            <td>None</td>
+            <td>Yes, as a transfer</td>
+          </tr>
+          <tr class="is-auth">
+            <td><code>token-send</code></td>
+            <td><code>p</code>, <code>op</code>, <code>items</code>, where each item carries <code>tick</code>, <code>amt</code>, <code>address</code></td>
+            <td><span class="tag tag-auth">Required</span></td>
+            <td>No</td>
+          </tr>
+          <tr class="is-auth">
+            <td><code>dmt-deploy</code></td>
+            <td><code>p</code>, <code>op</code>, <code>tick</code>, <code>elem</code>, <code>prv</code>, <code>dt</code> [<code>id</code>, <code>prj</code>]</td>
+            <td><span class="tag tag-auth">Required</span></td>
+            <td>Recorded, not normalised</td>
+          </tr>
+          <tr>
+            <td><code>dmt-mint</code></td>
+            <td><code>p</code>, <code>op</code>, <code>tick</code>, plus the deployment block reference</td>
+            <td>None</td>
+            <td>Recorded, not normalised</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="stack">
+      <article class="op" data-authority="none">
+        <div class="op-head"><code>token-deploy</code><span class="tag">Ordinary unless it names an authority</span></div>
+        <p>Creates a ticker. <code>max</code> is the supply cap and <code>lim</code> is the maximum amount a single mint may claim. Both are amount strings under section 5.</p>
+        <p>When <code>prv</code> is present it holds the inscription id of a privilege authority inscription. From that point the ticker has an authority, and privileged operations on it must be authorised by that authority. A deployment with no <code>prv</code> has no authority and no privileged operations.</p>
+        <pre><code>{ "p": "tap","op": "token-deploy","tick": "example","max": "21000000","lim": "1000","prv" : "&lt;authority inscription id&gt;"}</code></pre>
+        <p class="small">Ticker rules TK-1 to TK-5 apply. Bitcoin Universe's inscribe surface additionally applies rule TK-7 and requires <code>max</code> and <code>lim</code> to be greater than zero.</p>
+      </article>
+
+      <article class="op" data-authority="none">
+        <div class="op-head"><code>token-mint</code><span class="tag">Ordinary unless the deployment named an authority</span></div>
+        <p>Mints <code>amt</code> of <code>tick</code> to the address that receives the inscription, subject to the deployment's <code>lim</code> and remaining supply.</p>
+        <p>When the deployment named an authority, the mint body is produced by that authority rather than by the minter, and carries a <code>prv</code> object that includes the authority's salt. This is how a project keeps control of who may mint and on what terms while the mint stays a normal inscription.</p>
+      </article>
+
+      <article class="op" data-authority="none">
+        <div class="op-head"><code>token-transfer</code><span class="tag">Ordinary</span></div>
+        <p>Step one of the two step transfer. Inscribing it moves <code>amt</code> out of the inscriber's available balance and into a transferable balance bound to the new inscription. Sending that inscription to another address completes the transfer.</p>
+        <p>This is the only operation whose content contract is stated at byte level, in section 3. It is also the only TAP operation that Bitcoin Universe's marketplace authority will accept as proof of a listable position.</p>
+        <pre><code>{"p":"tap","op":"token-transfer","tick":"example","amt":"1.25","dta":"optional free data"}</code></pre>
+      </article>
+
+      <article class="op" data-authority="required">
+        <div class="op-head"><code>token-send</code><span class="tag tag-auth">Authority required</span></div>
+        <p>A single payload that moves balances for a list of items, each naming a ticker, an amount and a destination address. It is the operation that makes TAP different in kind from a plain inscribed token: one authorised payload can settle many movements without one transfer inscription per movement.</p>
+        <pre><code>{"p":"tap","op":"token-send","items":[{"tick":"example","amt":"100","address":"&lt;destination&gt;"}]}</code></pre>
+        <p class="small">Bitcoin Universe's Bitcoin TAP indexer does not index <code>token-send</code>. The operation appears in the organisation's code only as an unsigned draft payload on the Dogecoin variant of TAP. Treat the field list above as the shape observed in that code, not as a complete authorisation contract, and use the upstream Trac documentation for the signing rules.</p>
+      </article>
+
+      <article class="op" data-authority="required">
+        <div class="op-head"><code>dmt-deploy</code><span class="tag tag-auth">Authority required</span></div>
+        <p>A Digital Matter Theory deployment carried on the <code>tap</code> tag. <code>elem</code> names the element, <code>dt</code> the data type and <code>prv</code> the privilege authority inscription. <code>id</code> and <code>prj</code> are optional identifiers.</p>
+        <pre><code>{ "p": "tap","op": "dmt-deploy","tick": "dmt-example","elem": "&lt;element&gt;","prv" : "&lt;authority inscription id&gt;", "dt" : "&lt;type&gt;"}</code></pre>
+      </article>
+
+      <article class="op" data-authority="none">
+        <div class="op-head"><code>dmt-mint</code><span class="tag">Ordinary</span></div>
+        <p>A Digital Matter Theory mint, recognised by the deployment block it references. Bitcoin Universe indexes DMT with a separate service. Its TAP indexer records these rows as consumed source offsets so that nothing is silently skipped, and does not normalise them into TAP assets or events.</p>
+      </article>
+    </div>
+
+    <h2 id="authority">7. Authority model</h2>
+    <p>Delegated authority is TAP's distinguishing idea, and it is worth being precise about what it does and does not give you.</p>
+
+    <figure class="fig">
+      <svg viewBox="0 0 720 330" role="img" aria-labelledby="fig2t fig2d">
+        <title id="fig2t">How a deployment binds an authority, and what that authority can then authorise</title>
+        <desc id="fig2d">A privilege authority inscription is created first and holds a public key. A deployment then names that inscription in its prv field, which binds the ticker to the authority. From that point the authority can sign operation bodies, and an indexer treats a privileged operation as effective only when the signature traces back to the bound authority. An ordinary transfer bypasses the authority entirely and depends only on the holder's own balance and the location of the transfer inscription.</desc>
+        <defs>
+          <marker id="b1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0 10 5 0 10Z" class="d-arrow"/>
+          </marker>
+          <marker id="b2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0 10 5 0 10Z" class="d-arrow-auth"/>
+          </marker>
+        </defs>
+
+        <rect x="10" y="20" width="196" height="70" rx="8" class="d-auth" stroke-width="1.5"/>
+        <text x="26" y="46" class="d-text">1. Authority inscription</text>
+        <text x="26" y="66" class="d-text-sm">holds the authority public key</text>
+        <text x="26" y="82" class="d-text-sm">inscribed once, referenced forever</text>
+
+        <line x1="208" y1="55" x2="256" y2="55" class="d-flow-auth" stroke-width="2" marker-end="url(#b2)"/>
+
+        <rect x="260" y="20" width="200" height="70" rx="8" class="d-auth" stroke-width="1.5"/>
+        <text x="276" y="46" class="d-text">2. Deployment</text>
+        <text x="276" y="66" class="d-code">prv: &lt;inscription id&gt;</text>
+        <text x="276" y="82" class="d-text-sm">binds the ticker to that authority</text>
+
+        <line x1="462" y1="55" x2="510" y2="55" class="d-flow-auth" stroke-width="2" marker-end="url(#b2)"/>
+
+        <rect x="514" y="20" width="196" height="70" rx="8" class="d-auth" stroke-width="1.5"/>
+        <text x="530" y="46" class="d-text">3. Authorised body</text>
+        <text x="530" y="66" class="d-text-sm">signed by the authority,</text>
+        <text x="530" y="82" class="d-text-sm">carries a salt so it is single use</text>
+
+        <path d="M612 92 612 140 366 140" class="d-flow-auth" stroke-width="2" fill="none" marker-end="url(#b2)"/>
+
+        <rect x="160" y="152" width="200" height="66" rx="8" class="d-plain" stroke-width="1.5"/>
+        <text x="176" y="178" class="d-text">Indexer decision</text>
+        <text x="176" y="198" class="d-text-sm">effective only if the signature</text>
+        <text x="176" y="212" class="d-text-sm">traces to the bound authority</text>
+
+        <rect x="10" y="250" width="330" height="66" rx="8" class="d-plain" stroke-width="1.5"/>
+        <text x="26" y="276" class="d-text">Ordinary transfer, for contrast</text>
+        <text x="26" y="296" class="d-text-sm">no authority consulted, only the holder's</text>
+        <text x="26" y="310" class="d-text-sm">balance and the inscription's location</text>
+
+        <line x1="180" y1="246" x2="180" y2="222" class="d-flow" stroke-width="2" marker-end="url(#b1)"/>
+
+        <rect x="380" y="250" width="330" height="66" rx="8" class="d-plain" stroke-width="1.5" stroke-dasharray="5 4"/>
+        <text x="396" y="276" class="d-text-sm">The authority never holds anyone's balance and</text>
+        <text x="396" y="292" class="d-text-sm">cannot move it. It authorises operations that the</text>
+        <text x="396" y="308" class="d-text-sm">deployment already gave it the right to authorise.</text>
+      </svg>
+      <figcaption>The authority is named once, at deployment. Everything after that is a question of whether a given operation body traces back to it.</figcaption>
+    </figure>
+
+    <ul class="rules">
+      <li data-authority="required"><span class="rid">AU-1</span>A ticker has an authority only if its deployment named one in <code>prv</code>. There is no way to add an authority to a ticker that was deployed without one.</li>
+      <li data-authority="required"><span class="rid">AU-2</span>The authority is identified by an inscription. That inscription holds the public key against which authorised bodies are checked.</li>
+      <li data-authority="required"><span class="rid">AU-3</span>An authorised operation body is produced by the authority, not by the party submitting it. It carries a salt so that one authorisation cannot be replayed as another.</li>
+      <li data-authority="required"><span class="rid">AU-4</span>An authority bearing operation with no valid authorisation is not an operation. It is ignored under rule SC-5, exactly like a malformed payload.</li>
+      <li data-authority="required"><span class="rid">AU-5</span>Authority is scoped to the ticker whose deployment named it. It confers nothing on any other ticker.</li>
+      <li><span class="rid">AU-6</span>Ordinary operations are unaffected. A holder's own <code>token-transfer</code> never consults the authority, and an authority cannot block or reverse it.</li>
+      <li><span class="rid">AU-7</span><span class="tag tag-out">Universe</span> Bitcoin Universe's Bitcoin TAP indexer does not index authority bearing operations. It normalises deployments, mints, transfers and trades. Products that need authority semantics must obtain them from an indexer that implements them.</li>
+    </ul>
+
+    <div class="auth-note">
+      <p><strong>What an authority is worth trusting with.</strong> Naming an authority is a decision to trust a key with whatever privileged operations the protocol allows for that ticker, for as long as the ticker exists. Before holding a token whose deployment carries <code>prv</code>, look at what that authority can do, and remember that the ordinary transfer path in rule AU-6 is the part nobody else controls.</p>
+    </div>
+
+    <h2 id="state">8. State model and transitions</h2>
+    <p>Every TAP indexer keeps three things per ticker: the deployment terms, a balance per address, and the set of live transfer inscriptions with the amount each one carries.</p>
+    <ul class="rules">
+      <li><span class="rid">ST-1</span>A deployment establishes the ticker, its supply cap, its per mint limit and its decimal scale. A second deployment of an existing ticker has no effect.</li>
+      <li><span class="rid">ST-2</span>A mint increases the minter's available balance and the minted supply, up to the deployment's limits.</li>
+      <li><span class="rid">ST-3</span>Inscribing a <code>token-transfer</code> moves the amount from the inscriber's available balance to a transferable balance bound to that inscription. The inscriber's total holding does not change.</li>
+      <li><span class="rid">ST-4</span>A <code>token-transfer</code> for more than the inscriber's available balance has no effect. It does not partially apply and it does not queue.</li>
+      <li><span class="rid">ST-5</span>Sending a live transfer inscription to an address credits that address with the amount and consumes the inscription.</li>
+      <li><span class="rid">ST-6</span>A consumed transfer inscription is spent for protocol purposes. Sending it again moves an ordinal and no balance.</li>
+      <li><span class="rid">ST-7</span>Sending a live transfer inscription back to the address that created it settles the transfer at that same address. The transferable balance returns to available, and the inscription is consumed.</li>
+      <li><span class="rid">ST-8</span>Balances are per address and per ticker. There is no protocol level account, allowance or approval.</li>
+    </ul>
+
+    <h2 id="invalid">9. Invalidity conditions</h2>
+    <p>A payload is not a TAP operation when any of the following holds. This list is the practical reject set an implementation should test against; the <a href="vectors.html">test vectors page</a> gives a worked case for each group.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th scope="col">Group</th><th scope="col">Condition</th><th scope="col">Rule</th></tr></thead>
+        <tbody>
+          <tr><td>Encoding</td><td>Byte order mark present</td><td>EN-2</td></tr>
+          <tr><td>Encoding</td><td>Not valid UTF-8</td><td>EN-3</td></tr>
+          <tr><td>Encoding</td><td>Not a single JSON object, or the object is empty</td><td>EN-4, EN-5</td></tr>
+          <tr><td>Encoding</td><td>A value is a number, boolean, null, array or object</td><td>EN-6</td></tr>
+          <tr><td>Encoding</td><td>A key repeats</td><td>EN-7</td></tr>
+          <tr><td>Encoding</td><td>An unknown key is present</td><td>EN-8</td></tr>
+          <tr><td>Encoding</td><td>A required key is missing</td><td>EN-9</td></tr>
+          <tr><td>Encoding</td><td>Unescaped control character inside a string</td><td>EN-10</td></tr>
+          <tr><td>Encoding</td><td>Trailing comma, or data after the closing brace</td><td>EN-11, EN-12</td></tr>
+          <tr><td>Identity</td><td><code>p</code> is not <code>tap</code>, or <code>op</code> does not match the contract being applied</td><td>EN-13</td></tr>
+          <tr><td>Identity</td><td><code>dta</code> longer than 512 UTF-8 bytes</td><td>EN-14</td></tr>
+          <tr><td>Ticker</td><td>Empty, over 32 UTF-16 code units, or over 128 UTF-8 bytes</td><td>TK-2, TK-3</td></tr>
+          <tr><td>Ticker</td><td>Not already in NFC lower case form, in transfer content</td><td>TK-4</td></tr>
+          <tr><td>Ticker</td><td>Contains a Unicode control, format or separator character</td><td>TK-5</td></tr>
+          <tr><td>Amount</td><td>Not a string, or carries surrounding whitespace</td><td>AM-3</td></tr>
+          <tr><td>Amount</td><td>Leading zero, sign, exponent or separator</td><td>AM-4</td></tr>
+          <tr><td>Amount</td><td>More fractional digits than the decimal scale</td><td>AM-5</td></tr>
+          <tr><td>Amount</td><td>Atomic value longer than 78 digits</td><td>AM-7</td></tr>
+          <tr><td>Deployment</td><td>Declared decimal scale outside 0 to 18</td><td>AM-2</td></tr>
+          <tr><td>State</td><td>Transfer amount above the available balance</td><td>ST-4</td></tr>
+          <tr><td>State</td><td>Reuse of a consumed transfer inscription</td><td>ST-6</td></tr>
+          <tr class="is-auth"><td>Authority</td><td>Authority bearing operation with no valid authorisation</td><td>AU-4</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="universe">10. Bitcoin Universe indexing decisions</h2>
+    <p>These are choices made by Bitcoin Universe's indexer. They are not properties of TAP, and another conforming indexer may reasonably differ.</p>
+    <ul class="rules">
+      <li><span class="rid">UN-1</span>Source coverage is reported as <code>partial</code>, with this recorded reason: <em>The Universe-operated TAP writer provides confirmed indexed state and authenticated block digests but no pending mempool feed. Tail checks detect confirmed replacements visible in writer lists.</em></li>
+      <li><span class="rid">UN-2</span>Activity for a ticker with no known deployment is held back until the deployment stream has been read to its current length. If the deployment is still absent, the row is quarantined rather than scaled with a guessed decimal scale. A later deployment rewinds and retries it.</li>
+      <li><span class="rid">UN-3</span>When deployment metadata changes, affected activity is invalidated and rewound before the new decimal scale is applied.</li>
+      <li><span class="rid">UN-4</span>Rows that carry a block height are recorded as confirmed. Rows without block evidence stay pending. This is not a claim of complete pending coverage.</li>
+      <li><span class="rid">UN-5</span>Trade rows map to a listing, unlisting, offer, accepted offer or sale when the source action gives that evidence. An unknown trade action maps to a listing and keeps the raw action alongside it.</li>
+      <li><span class="rid">UN-6</span>The <code>dmt-</code> family is recorded as consumed source offsets and is not normalised into TAP assets or events.</li>
+      <li><span class="rid">UN-7</span>A raw source record is capped at 256 KiB. An oversized row keeps its SHA-256 fingerprint and byte count, is quarantined, and is never guessed at.</li>
+      <li><span class="rid">UN-8</span>The service pins its source identity, chain, network, writer version and writer revision, and stores an identity hash in its database. A database created for another source cannot be opened.</li>
+    </ul>
+
+    <div class="note">
+      <p>Continue to the <a href="reference.html#indexer">reference</a> for confirmation, mempool and reorg semantics in full, or to the <a href="vectors.html">test vectors</a> for payloads you can run against your own implementation.</p>
+    </div>
+  </main>
+</div>
+
+<footer class="pagefoot">
+  <div class="shell">
+    <div class="footgrid">
+      <dl>
+        <dt>Owning repository</dt><dd><a href="https://github.com/bitcoinuniverseio/tap">bitcoinuniverseio/tap</a></dd>
+        <dt>Source path</dt><dd><code>spec.html</code></dd>
+        <dt>Document version</dt><dd>2.0.0</dd>
+      </dl>
+      <dl>
+        <dt>Lifecycle</dt><dd>Experimental</dd>
+        <dt>Chain and network</dt><dd>Bitcoin mainnet</dd>
+        <dt>Last verified</dt><dd><time datetime="2026-09-01">1 September 2026</time></dd>
+      </dl>
+      <dl>
+        <dt>Edit this page</dt><dd><a href="https://github.com/bitcoinuniverseio/tap/edit/main/spec.html">on GitHub</a></dd>
+        <dt>Portal</dt><dd><a href="https://docs.bitcoinuniverse.io/">docs.bitcoinuniverse.io</a></dd>
+        <dt>Report a flaw</dt><dd><a href="https://github.com/bitcoinuniverseio/tap/security/advisories/new">Private advisory</a></dd>
+      </dl>
+    </div>
+    <p class="footnote">TAP originates in the Trac ecosystem. This documentation describes the Bitcoin mainnet profile that Bitcoin Universe indexes, and marks Bitcoin Universe specific decisions where they occur.</p>
+  </div>
+</footer>
+
+<script src="site.js" defer></script>
+</body>
+</html>
