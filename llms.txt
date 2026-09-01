@@ -1,32 +1,107 @@
-# TAP Protocol
+# TAP protocol documentation
 
-> TAP begins with deploy, mint, and transfer, then opens into authorities, peer-to-peer experiences, mass sends, and decentralized token mechanics.
+> TAP is an inscribed token protocol from the Trac ecosystem, carried by Ordinal
+> inscriptions on Bitcoin mainnet under the protocol tag `tap`. It keeps the
+> deploy, mint and two step inscribe then send transfer of an inscribed token,
+> widens the ticker space to 32 UTF-16 code units, and adds delegated authority:
+> a deployment can name a privilege authority inscription in its `prv` field,
+> after which privileged operations on that ticker require that authority's
+> authorisation. This site documents the Bitcoin mainnet profile that Bitcoin
+> Universe indexes. TAP is an upstream protocol, not a Bitcoin Universe
+> invention.
 
-## Public experience
+Site base: https://bitcoinuniverseio.github.io/tap/
+Owning repository: https://github.com/bitcoinuniverseio/tap
+Document version: 2.0.0
+Lifecycle: experimental
+Chain and network: bitcoin, mainnet
+Last verified: 2026-09-01
 
-- Home: https://bitcoinuniverse.github.io/tap/
-- Discover: https://bitcoinuniverse.github.io/tap/reference.html
-- Get started: https://bitcoinuniverse.github.io/tap/guide.html
-- Bitcoin Universe: https://inscribe.bitcoinuniverse.io/
+## Pages
 
-## The experience
+- [Overview](https://bitcoinuniverseio.github.io/tap/index.html): what TAP is in
+  plain language, who it is for, the protocol facts pinned by the indexer and
+  registry, operations at a glance, the Bitcoin Universe support matrix, related
+  protocols and how to report a flaw.
+- [Specification](https://bitcoinuniverseio.github.io/tap/spec.html): numbered
+  normative rules. Scope, carrier and transaction anatomy, the byte level payload
+  contract for `token-transfer`, ticker rules, decimals and amounts, the operation
+  table with per operation field requirements, the authority model, state
+  transitions, every invalidity condition, and the indexing decisions specific to
+  Bitcoin Universe.
+- [Guide](https://bitcoinuniverseio.github.io/tap/guide.html): the two step
+  inscribe then send transfer worked end to end, with payloads for deploy, mint
+  and transfer, the mistakes that cost money, the Bitcoin Universe support matrix
+  and what the marketplace must prove before a listing exists.
+- [Reference](https://bitcoinuniverseio.github.io/tap/reference.html):
+  terminology, indexer semantics, confirmation states, mempool coverage, reorg
+  behaviour, marketplace policy, a concrete comparison with BRC-20, fee and size
+  considerations, limitations, security considerations and an implementation
+  checklist.
+- [Test vectors](https://bitcoinuniverseio.github.io/tap/vectors.html): accepted
+  and rejected payloads taken from the test suite of Bitcoin Universe's TAP
+  indexer, each mapped to the rule that decides it, plus a rule coverage table.
+- [Validator](https://bitcoinuniverseio.github.io/tap/validator.html): a client
+  side TAP payload validator. It identifies the operation, checks required
+  fields, explains the authority requirement and names the rule behind any
+  rejection. Nothing pasted into it leaves the page.
+- [Changelog](https://bitcoinuniverseio.github.io/tap/changelog.html): document
+  version history, versioning policy and known gaps.
+- [Not found](https://bitcoinuniverseio.github.io/tap/404.html): the error page,
+  which lists every page on the site.
 
-- Launch: Create a token identity and define its supply and mint personality.
-- Collect: Mint under the token’s terms and hold it in a compatible wallet.
-- Connect: Transfer, coordinate, and explore richer TAP-enabled experiences.
+## Machine readable
 
-## In plain language
+- [Search index](https://bitcoinuniverseio.github.io/tap/search-index.json)
+- [Documentation manifest](https://bitcoinuniverseio.github.io/tap/docs.manifest.json)
+- [Sitemap](https://bitcoinuniverseio.github.io/tap/sitemap.xml)
 
-- Basic actions: Deploy, mint, and transfer form the familiar TAP foundation.
-- Transferables: A transfer becomes an inscription that is sent to its destination.
-- Expressive tickers: TAP supports a broad visual character space for identities.
-- Extensions: Compatible experiences can add authorities, P2P, DMT, and more.
+## Key facts
 
-## User safety
+- Protocol tag: `p` equal to `tap`, exact and lower case.
+- Carrier: Ordinal inscriptions. Bitcoin Universe writes TAP payloads as
+  `text/plain;charset=utf-8`.
+- Operations documented here: `token-deploy`, `token-mint`, `token-transfer`,
+  `token-send`, `dmt-deploy`, `dmt-mint`.
+- Authority bearing operations: `token-send` and `dmt-deploy`. `token-deploy` and
+  `token-mint` become authority bearing when the deployment names `prv`.
+- Ticker rules: NFC lower case, at most 32 UTF-16 code units and 128 UTF-8 bytes,
+  no Unicode control, format or separator characters. A negative inscription
+  number places the ticker in a namespace prefixed with `-`.
+- Amount rules: exact JSON string matching `^(0|[1-9]\d*)(?:\.(\d+))?$`,
+  fractional digits no longer than the deployment decimal scale, atomic value at
+  most 78 digits, converted by string padding and never by floating point.
+- Transfer content contract: required fields `p`, `op`, `tick`, `amt`, optional
+  `dta` capped at 512 UTF-8 bytes. No other field, no duplicate field, no non
+  string value, no byte order mark, no trailing comma, no trailing data.
+- Two step transfer: inscribing a `token-transfer` moves the amount into a
+  transferable balance bound to that inscription; sending the inscription credits
+  the recipient and consumes it.
+- Indexer coverage: `partial`. Confirmed state only, no mempool feed. Rows with a
+  block height are confirmed, rows without are pending. Reorg detection is tail
+  replacement only and requires positive replacement evidence.
+- Marketplace: feature gated behind `tapMarketplaceV1`, in app execution,
+  settlement at one Bitcoin confirmation, automatic reorg reconciliation. The
+  `sell` action is unsupported, with the recorded reason "TAP has no executable
+  offer workflow on this marketplace surface."
+- Bitcoin Universe surfaces: Core for discovery and marketplace actions, Wallet
+  for view, send and receive, Inscribe for deploy, mint and transfer. Authority
+  bearing operations are not indexed or executed by any of them.
 
-TAP transfers and extensions depend on compatible wallet and service support. Protect transferable inscriptions from accidental spending and verify the exact action, destination, and fees before signing.
+## Related
 
-## Community resources
+- [TAP on Doge](https://bitcoinuniverseio.github.io/tap-on-doge/): the Dogecoin
+  variant, documented in its own repository. Nothing on this site carries over.
+- [docs.bitcoinuniverse.io](https://docs.bitcoinuniverse.io/): the central
+  documentation portal.
+- [docs.tap-protocol.com](https://docs.tap-protocol.com/): upstream TAP
+  documentation from the Trac ecosystem, including operations beyond the ones
+  Bitcoin Universe indexes.
 
-- Explore TAP: https://docs.tap-protocol.com/
-- See TAP’s core experiences: https://docs.tap-protocol.com/functions/quickstart
+## Scope and honesty
+
+Every rule on this site is traced to code that Bitcoin Universe runs or to the
+protocol registry it maintains. Where TAP defines behaviour that does not appear
+in that code, this site says so and points upstream rather than restating rules
+it cannot verify. Support claims cover Bitcoin Universe surfaces only, and record
+what the product code implements rather than what is enabled in production.

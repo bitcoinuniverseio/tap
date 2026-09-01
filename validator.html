@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TAP payload validator: check an inscription payload in your browser</title>
+<meta name="description" content="Paste a TAP inscription payload and see the operation it declares, whether it satisfies the required fields, whether it needs an authority, and the exact rule behind any rejection. Runs entirely client side.">
+<link rel="canonical" href="https://bitcoinuniverseio.github.io/tap/validator.html">
+<meta name="theme-color" content="#0b0e26" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f5fb" media="(prefers-color-scheme: light)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TAP payload validator: check an inscription payload in your browser">
+<meta property="og:description" content="Identify a TAP operation, validate its fields, and see the authority requirement. Nothing you paste leaves the page.">
+<meta property="og:url" content="https://bitcoinuniverseio.github.io/tap/validator.html">
+<meta property="og:image" content="https://bitcoinuniverseio.github.io/tap/og.svg">
+<meta property="og:site_name" content="TAP protocol documentation">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="masthead">
+  <div class="shell masthead-in">
+    <a class="seal" href="index.html">
+      <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true" focusable="false">
+        <path d="M17 2.4 29.6 9.2v15.6L17 31.6 4.4 24.8V9.2Z" fill="var(--indigo-soft)" stroke="var(--indigo)" stroke-width="1.6" stroke-linejoin="round"/>
+        <path d="M10.8 17.4 15.2 22 23.2 12.6" fill="none" stroke="var(--gold-line)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>TAP<small>Protocol documentation</small></span>
+    </a>
+    <nav class="mainnav" aria-label="Documentation sections">
+      <ul>
+        <li><a href="index.html">Overview</a></li>
+        <li><a href="spec.html">Specification</a></li>
+        <li><a href="guide.html">Guide</a></li>
+        <li><a href="reference.html">Reference</a></li>
+        <li><a href="vectors.html">Test vectors</a></li>
+        <li><a href="validator.html" aria-current="page">Validator</a></li>
+        <li><a href="changelog.html">Changelog</a></li>
+      </ul>
+    </nav>
+    <div class="tools">
+      <form class="searchbox" role="search" hidden>
+        <label class="vh" for="site-search">Search this documentation</label>
+        <input id="site-search" type="search" placeholder="Search, or press /" autocomplete="off" data-base="" hidden>
+        <ul class="hitlist" id="site-search-results"></ul>
+      </form>
+      <button class="themebtn" id="theme-toggle" type="button" hidden aria-pressed="false">Dark</button>
+    </div>
+  </div>
+</header>
+
+<div class="shell frame">
+  <nav class="sidenav" aria-label="On this page">
+    <p>On this page</p>
+    <ul>
+      <li><a href="#tool">The validator</a></li>
+      <li><a href="#samples">Sample payloads</a></li>
+      <li><a href="#scope">What it checks</a></li>
+      <li><a href="#privacy">Privacy</a></li>
+    </ul>
+  </nav>
+
+  <main class="doc" id="main">
+    <p class="kicker">Interactive tool</p>
+    <h1>TAP payload validator</h1>
+    <p class="lede">Paste a TAP inscription payload. The tool identifies the operation, checks the fields that operation requires, explains the authority requirement when the operation is authority bearing, and names the rule behind any rejection.</p>
+    <ul class="stamp">
+      <li>Profile <b>index-tap</b></li>
+      <li>Chain <b>Bitcoin</b></li>
+      <li>Network <b>mainnet</b></li>
+      <li>Document version <b>2.0.0</b></li>
+      <li>Runs <b>in your browser only</b></li>
+    </ul>
+
+    <h2 id="tool">The validator</h2>
+
+    <noscript>
+      <div class="warn">
+        <p><strong>This tool needs JavaScript.</strong> Every other page on this site works without it. If you would rather not enable it, the same decisions are written out as rules in the <a href="spec.html">specification</a> and as worked cases on the <a href="vectors.html">test vectors page</a>.</p>
+      </div>
+    </noscript>
+
+    <div id="validator-fallback" class="note">
+      <p>Loading the validator. If this message stays, JavaScript is unavailable and you can use the <a href="spec.html">specification</a> and the <a href="vectors.html">test vectors</a> instead.</p>
+    </div>
+
+    <form id="validator" hidden>
+      <div class="tool">
+        <div>
+          <label for="payload">TAP payload</label>
+          <textarea id="payload" spellcheck="false" autocomplete="off" placeholder='{"p":"tap","op":"token-transfer","tick":"signal","amt":"1.25"}'></textarea>
+          <div class="cols" style="margin-top:12px">
+            <div>
+              <label for="decimals">Deployment decimal scale</label>
+              <input id="decimals" type="number" min="0" max="18" step="1" value="0" style="font:inherit;padding:7px 10px;width:100%;color:var(--ink);background:var(--surface);border:1px solid var(--line-strong);border-radius:6px">
+            </div>
+            <div>
+              <label for="inscription-number">Inscription number</label>
+              <input id="inscription-number" type="number" step="1" value="1" style="font:inherit;padding:7px 10px;width:100%;color:var(--ink);background:var(--surface);border:1px solid var(--line-strong);border-radius:6px">
+            </div>
+          </div>
+          <div class="toolbar">
+            <button type="submit" class="primary">Check payload</button>
+            <button type="button" id="clear">Clear</button>
+          </div>
+          <p class="small">The decimal scale comes from the deployment, not from the payload, so amounts can only be converted once you supply it. A negative inscription number moves the ticker into the cursed namespace.</p>
+        </div>
+        <div>
+          <h3 class="vh">Result</h3>
+          <div class="result" id="result" data-state="info" role="status" aria-live="polite">
+            <h3>Paste a TAP payload to check it</h3>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <h2 id="samples">Sample payloads</h2>
+    <p class="jsonly">Load one of these into the validator to see the check run.</p>
+    <p class="nojs">These are the payloads the buttons on this page load when JavaScript is available.</p>
+    <div class="stack">
+      <article class="op" data-authority="none">
+        <div class="op-head"><code>token-transfer</code><span class="tag">Valid</span></div>
+        <pre><code>{"p":"tap","op":"token-transfer","tick":"signal","amt":"1.25","dta":"invoice 4192"}</code></pre>
+        <div class="toolbar jsonly">
+          <button type="button" data-decimals="2" data-sample='{"p":"tap","op":"token-transfer","tick":"signal","amt":"1.25","dta":"invoice 4192"}'>Load this payload</button>
+        </div>
+      </article>
+
+      <article class="op" data-authority="none">
+        <div class="op-head"><code>token-transfer</code><span class="tag tag-no">Duplicate field</span></div>
+        <pre><code>{"p":"tap","p":"tap","op":"token-transfer","tick":"tapx","amt":"1"}</code></pre>
+        <div class="toolbar jsonly">
+          <button type="button" data-decimals="0" data-sample='{"p":"tap","p":"tap","op":"token-transfer","tick":"tapx","amt":"1"}'>Load this payload</button>
+        </div>
+      </article>
+
+      <article class="op" data-authority="none">
+        <div class="op-head"><code>token-transfer</code><span class="tag tag-no">Numeric amount</span></div>
+        <pre><code>{"p":"tap","op":"token-transfer","tick":"tapx","amt":1}</code></pre>
+        <div class="toolbar jsonly">
+          <button type="button" data-decimals="0" data-sample='{"p":"tap","op":"token-transfer","tick":"tapx","amt":1}'>Load this payload</button>
+        </div>
+      </article>
+
+      <article class="op" data-authority="none">
+        <div class="op-head"><code>token-transfer</code><span class="tag">Cursed inscription</span></div>
+        <pre><code>{"p":"tap","op":"token-transfer","tick":"tapx","amt":"1"}</code></pre>
+        <p class="small">Loaded at inscription number <code>-1</code>, so the indexed ticker becomes <code>-tapx</code>.</p>
+        <div class="toolbar jsonly">
+          <button type="button" data-decimals="0" data-number="-1" data-sample='{"p":"tap","op":"token-transfer","tick":"tapx","amt":"1"}'>Load this payload</button>
+        </div>
+      </article>
+
+      <article class="op" data-authority="required">
+        <div class="op-head"><code>token-deploy</code><span class="tag tag-auth">Names an authority</span></div>
+        <pre><code>{ "p": "tap","op": "token-deploy","tick": "signal","max": "21000000","lim": "1000","prv" : "d4e5f60000000000000000000000000000000000000000000000000000000000i0"}</code></pre>
+        <div class="toolbar jsonly">
+          <button type="button" data-decimals="0" data-sample='{ "p": "tap","op": "token-deploy","tick": "signal","max": "21000000","lim": "1000","prv" : "d4e5f60000000000000000000000000000000000000000000000000000000000i0"}'>Load this payload</button>
+        </div>
+      </article>
+
+      <article class="op" data-authority="required">
+        <div class="op-head"><code>token-send</code><span class="tag tag-auth">Authority required</span></div>
+        <pre><code>{"p":"tap","op":"token-send","items":[{"tick":"signal","amt":"100","address":"bc1qexampleaddressvaluehere0000000000000000"}]}</code></pre>
+        <div class="toolbar jsonly">
+          <button type="button" data-decimals="0" data-sample='{"p":"tap","op":"token-send","items":[{"tick":"signal","amt":"100","address":"bc1qexampleaddressvaluehere0000000000000000"}]}'>Load this payload</button>
+        </div>
+      </article>
+    </div>
+
+    <h2 id="scope">What it checks, and what it cannot</h2>
+    <div class="cols">
+      <div class="panel">
+        <h3>It checks</h3>
+        <ul>
+          <li>The byte level content contract for <code>token-transfer</code>, as a direct port of the parser in Bitcoin Universe's TAP indexer.</li>
+          <li>The protocol tag and the operation name.</li>
+          <li>The required and optional field set for each documented operation.</li>
+          <li>Ticker length in UTF-16 code units and UTF-8 bytes, NFC lower case form, and forbidden Unicode categories.</li>
+          <li>The amount grammar, the decimal scale you supply, and the atomic conversion.</li>
+          <li>The <code>dta</code> byte cap.</li>
+          <li>Whether the operation is authority bearing, and why.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3>It cannot check</h3>
+        <ul>
+          <li>Whether the ticker exists, or what decimal scale its deployment declared. You supply the scale.</li>
+          <li>Whether the sender has the balance. That needs chain state.</li>
+          <li>Whether an authorisation signature is valid. Bitcoin Universe's TAP indexer does not index authority bearing operations, so this site does not claim to verify them.</li>
+          <li>Whether the inscription exists, where it sits, or whether it has already been consumed.</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2 id="privacy">Privacy</h2>
+    <p>The whole check runs in this page. There is no network request when you press the button, nothing is written to storage, and nothing is logged. The only stored value this site keeps at all is your light or dark theme preference, and you can clear it by clearing this site's data.</p>
+  </main>
+</div>
+
+<footer class="pagefoot">
+  <div class="shell">
+    <div class="footgrid">
+      <dl>
+        <dt>Owning repository</dt><dd><a href="https://github.com/bitcoinuniverseio/tap">bitcoinuniverseio/tap</a></dd>
+        <dt>Source path</dt><dd><code>validator.html</code></dd>
+        <dt>Document version</dt><dd>2.0.0</dd>
+      </dl>
+      <dl>
+        <dt>Lifecycle</dt><dd>Experimental</dd>
+        <dt>Chain and network</dt><dd>Bitcoin mainnet</dd>
+        <dt>Last verified</dt><dd><time datetime="2026-09-01">1 September 2026</time></dd>
+      </dl>
+      <dl>
+        <dt>Edit this page</dt><dd><a href="https://github.com/bitcoinuniverseio/tap/edit/main/validator.html">on GitHub</a></dd>
+        <dt>Portal</dt><dd><a href="https://docs.bitcoinuniverse.io/">docs.bitcoinuniverse.io</a></dd>
+        <dt>Report a flaw</dt><dd><a href="https://github.com/bitcoinuniverseio/tap/security/advisories/new">Private advisory</a></dd>
+      </dl>
+    </div>
+    <p class="footnote">TAP originates in the Trac ecosystem. This documentation describes the Bitcoin mainnet profile that Bitcoin Universe indexes, and marks Bitcoin Universe specific decisions where they occur.</p>
+  </div>
+</footer>
+
+<script src="site.js" defer></script>
+<script src="validator.js" defer></script>
+</body>
+</html>
